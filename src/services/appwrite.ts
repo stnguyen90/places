@@ -1,12 +1,15 @@
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
 import { Appwrite, Query } from "appwrite";
-import { Place } from "./types";
+import { Comment, Photo, Place, User } from "./types";
 
 // Init your Web SDK
-const sdk = new Appwrite();
+export const sdk = new Appwrite();
 
 const Collections = {
   Places: "places",
+  Users: "users",
+  Comments: "comments",
+  Photos: "photos",
 } as const;
 
 const Attributes = {
@@ -14,11 +17,27 @@ const Attributes = {
     Latitude: "latitude",
     Longitude: "longitude",
   },
+  Users: {
+    Name: "name",
+  },
+  Comments: {
+    Created: "created",
+    PlaceId: "place_id",
+    UserId: "user_id",
+    Text: "text",
+  },
+  Photos: {
+    Created: "created",
+    PlaceId: "place_id",
+    UserId: "user_id",
+    FileId: "file_id",
+    Text: "text",
+  },
 } as const;
 
 sdk
-  .setEndpoint("https://appwrite-dev.g33kdev.com/v1") // Your Appwrite Endpoint
-  .setProject("potty-places"); // Your project ID
+  .setEndpoint(process.env["REACT_APP_APPWRITE_ENDPOINT"] || "")
+  .setProject(process.env["REACT_APP_APPWRITE_PROJECT_ID"] || "");
 
 export const appwriteApi = createApi({
   baseQuery: fakeBaseQuery(),
@@ -33,9 +52,6 @@ export const appwriteApi = createApi({
       }
     >({
       queryFn: async (arg) => {
-        if (!arg.minLat && !arg.maxLat && !arg.minLong && !arg.maxLong)
-          return { data: [] };
-
         try {
           const documentList = await sdk.database.listDocuments<Place>(
             Collections.Places,
@@ -54,9 +70,86 @@ export const appwriteApi = createApi({
         }
       },
     }),
+    getUsers: builder.query<
+      User[],
+      {
+        user_ids: string[];
+      }
+    >({
+      queryFn: async (arg) => {
+        try {
+          const documentList = await sdk.database.listDocuments<User>(
+            Collections.Users,
+            [Query.equal("$id", arg.user_ids)]
+          );
+          return { data: documentList.documents };
+        } catch (e) {
+          return {
+            error: e,
+          };
+        }
+      },
+    }),
+    getComments: builder.query<
+      Comment[],
+      {
+        place_id: string;
+      }
+    >({
+      queryFn: async (arg) => {
+        try {
+          const documentList = await sdk.database.listDocuments<Comment>(
+            Collections.Comments,
+            [Query.equal(Attributes.Comments.PlaceId, arg.place_id)],
+            undefined, // limit
+            undefined, // offset
+            undefined, // cursor
+            undefined, // cursorDirection
+            ["created"], // orderAttributes
+            ["DESC"] // orderTypes
+          );
+          return { data: documentList.documents };
+        } catch (e) {
+          return {
+            error: e,
+          };
+        }
+      },
+    }),
+    getPhotos: builder.query<
+      Photo[],
+      {
+        place_id: string;
+      }
+    >({
+      queryFn: async (arg) => {
+        try {
+          const documentList = await sdk.database.listDocuments<Photo>(
+            Collections.Photos,
+            [Query.equal(Attributes.Comments.PlaceId, arg.place_id)],
+            undefined, // limit
+            undefined, // offset
+            undefined, // cursor
+            undefined, // cursorDirection
+            ["created"], // orderAttributes
+            ["DESC"] // orderTypes
+          );
+          return { data: documentList.documents };
+        } catch (e) {
+          return {
+            error: e,
+          };
+        }
+      },
+    }),
   }),
 });
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const { useGetPlacesQuery } = appwriteApi;
+export const {
+  useGetPlacesQuery,
+  useGetUsersQuery,
+  useGetCommentsQuery,
+  useGetPhotosQuery,
+} = appwriteApi;
