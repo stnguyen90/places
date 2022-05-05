@@ -1,5 +1,5 @@
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
-import { Appwrite, Query } from "appwrite";
+import { Appwrite, Models, Query } from "appwrite";
 import { Comment, Photo, Place, User } from "./types";
 
 // Init your Web SDK
@@ -41,7 +41,75 @@ sdk
 
 export const appwriteApi = createApi({
   baseQuery: fakeBaseQuery(),
+  tagTypes: ["Account"],
   endpoints: (builder) => ({
+    createAccount: builder.mutation<
+      Models.User<Models.Preferences>,
+      { name: string; email: string; password: string }
+    >({
+      queryFn: async (args) => {
+        try {
+          const account = await sdk.account.create(
+            "unique()",
+            args.email,
+            args.password,
+            args.name
+          );
+          return { data: account };
+        } catch (e) {
+          return {
+            error: e,
+          };
+        }
+      },
+    }),
+    createSession: builder.mutation<
+      Models.Session,
+      { email: string; password: string }
+    >({
+      invalidatesTags: ["Account"],
+      queryFn: async (args) => {
+        try {
+          const session = await sdk.account.createSession(
+            args.email,
+            args.password
+          );
+
+          return { data: session };
+        } catch (e) {
+          return {
+            error: e,
+          };
+        }
+      },
+    }),
+    deleteSession: builder.mutation<null, void>({
+      invalidatesTags: ["Account"],
+      queryFn: async () => {
+        try {
+          await sdk.account.deleteSession("");
+
+          return { data: null };
+        } catch (e) {
+          return {
+            error: e,
+          };
+        }
+      },
+    }),
+    getAccount: builder.query<Models.User<Models.Preferences> | null, void>({
+      providesTags: ["Account"],
+      queryFn: async () => {
+        try {
+          const account = await sdk.account.get();
+          return { data: account };
+        } catch (e) {
+          return {
+            data: null,
+          };
+        }
+      },
+    }),
     getPlaces: builder.query<
       Place[],
       {
@@ -148,6 +216,10 @@ export const appwriteApi = createApi({
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
 export const {
+  useCreateAccountMutation,
+  useCreateSessionMutation,
+  useDeleteSessionMutation,
+  useGetAccountQuery,
   useGetPlacesQuery,
   useGetUsersQuery,
   useGetCommentsQuery,

@@ -14,7 +14,6 @@ import {
 } from "@mui/material";
 import { PlacesMap } from "./features/places-map/PlacesMap";
 import { PlacesAppBar } from "./features/places-app-bar/PlacesAppBar";
-import PrimarySearchAppBar from "./features/places-app-bar/PrimarySearchAppBar";
 
 // function App() {
 //   return (
@@ -85,7 +84,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <Box sx={{ display: "flex", height: "100vh" }}>
         <CssBaseline />
-        <PrimarySearchAppBar />
+        <PlacesAppBar />
         <Box
           component="main"
           sx={{ display: "flex", flexGrow: 1, flexFlow: "column" }}
