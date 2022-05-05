@@ -41,7 +41,7 @@ sdk
 
 export const appwriteApi = createApi({
   baseQuery: fakeBaseQuery(),
-  tagTypes: ["Account"],
+  tagTypes: ["Account", "Comments", "Users", "Photos"],
   endpoints: (builder) => ({
     createAccount: builder.mutation<
       Models.User<Models.Preferences>,
@@ -158,12 +158,39 @@ export const appwriteApi = createApi({
         }
       },
     }),
+    createComment: builder.mutation<
+      Models.Document,
+      { place_id: string; user_id: string; text: string }
+    >({
+      invalidatesTags: ["Comments"],
+      queryFn: async (args) => {
+        try {
+          const document = await sdk.database.createDocument(
+            "comments",
+            "unique()",
+            {
+              created: new Date().toISOString(),
+              place_id: args.place_id,
+              user_id: args.user_id,
+              text: args.text,
+            }
+          );
+
+          return { data: document };
+        } catch (e) {
+          return {
+            error: e,
+          };
+        }
+      },
+    }),
     getComments: builder.query<
       Comment[],
       {
         place_id: string;
       }
     >({
+      providesTags: ["Comments"],
       queryFn: async (arg) => {
         try {
           const documentList = await sdk.database.listDocuments<Comment>(
@@ -222,6 +249,7 @@ export const {
   useGetAccountQuery,
   useGetPlacesQuery,
   useGetUsersQuery,
+  useCreateCommentMutation,
   useGetCommentsQuery,
   useGetPhotosQuery,
 } = appwriteApi;

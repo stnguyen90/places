@@ -44,7 +44,12 @@ export function PlaceDialog(props: {
           <PlaceTabs place={props.place} />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Close</Button>
+          <Button onClick={handleClose} variant="outlined">
+            Close
+          </Button>
+          {/* <Button onClick={handleClose} variant="contained">
+            Add Comment
+          </Button> */}
         </DialogActions>
       </Dialog>
     </div>
