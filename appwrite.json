@@ -1,0 +1,377 @@
+{
+    "projectId": "places",
+    "projectName": "Places",
+    "collections": [
+        {
+            "$id": "places",
+            "$read": [
+                "role:all"
+            ],
+            "$write": [],
+            "name": "Places",
+            "enabled": true,
+            "permission": "collection",
+            "attributes": [
+                {
+                    "key": "latitude",
+                    "type": "double",
+                    "status": "available",
+                    "required": true,
+                    "array": false,
+                    "min": -90,
+                    "max": 90,
+                    "default": null
+                },
+                {
+                    "key": "longitude",
+                    "type": "double",
+                    "status": "available",
+                    "required": true,
+                    "array": false,
+                    "min": -180,
+                    "max": 180,
+                    "default": null
+                },
+                {
+                    "key": "status",
+                    "type": "string",
+                    "status": "available",
+                    "required": true,
+                    "array": false,
+                    "size": 50,
+                    "default": null
+                }
+            ],
+            "indexes": [
+                {
+                    "key": "unique_latitude_asc_longitude_asc",
+                    "type": "unique",
+                    "status": "available",
+                    "attributes": [
+                        "latitude",
+                        "longitude"
+                    ],
+                    "orders": [
+                        "ASC",
+                        "ASC"
+                    ]
+                }
+            ]
+        },
+        {
+            "$id": "submissions",
+            "$read": [],
+            "$write": [],
+            "name": "Submissions",
+            "enabled": true,
+            "permission": "collection",
+            "attributes": [
+                {
+                    "key": "user_id",
+                    "type": "string",
+                    "status": "available",
+                    "required": true,
+                    "array": false,
+                    "size": 50,
+                    "default": null
+                },
+                {
+                    "key": "latitude",
+                    "type": "double",
+                    "status": "available",
+                    "required": true,
+                    "array": false,
+                    "min": -90,
+                    "max": 90,
+                    "default": null
+                },
+                {
+                    "key": "longitude",
+                    "type": "double",
+                    "status": "available",
+                    "required": true,
+                    "array": false,
+                    "min": -180,
+                    "max": 180,
+                    "default": null
+                },
+                {
+                    "key": "created",
+                    "type": "string",
+                    "status": "available",
+                    "required": true,
+                    "array": false,
+                    "size": 50,
+                    "default": null
+                }
+            ],
+            "indexes": [
+                {
+                    "key": "unique_latitude_asc_longitude_asc",
+                    "type": "unique",
+                    "status": "available",
+                    "attributes": [
+                        "latitude",
+                        "longitude"
+                    ],
+                    "orders": [
+                        "ASC",
+                        "ASC"
+                    ]
+                },
+                {
+                    "key": "key_created_asc",
+                    "type": "key",
+                    "status": "available",
+                    "attributes": [
+                        "created"
+                    ],
+                    "orders": [
+                        "ASC"
+                    ]
+                },
+                {
+                    "key": "key_user_id_asc",
+                    "type": "key",
+                    "status": "available",
+                    "attributes": [
+                        "user_id"
+                    ],
+                    "orders": [
+                        "ASC"
+                    ]
+                }
+            ]
+        },
+        {
+            "$id": "comments",
+            "$read": [
+                "role:all"
+            ],
+            "$write": [],
+            "name": "Comments",
+            "enabled": true,
+            "permission": "collection",
+            "attributes": [
+                {
+                    "key": "place_id",
+                    "type": "string",
+                    "status": "available",
+                    "required": true,
+                    "array": false,
+                    "size": 50,
+                    "default": null
+                },
+                {
+                    "key": "user_id",
+                    "type": "string",
+                    "status": "available",
+                    "required": true,
+                    "array": false,
+                    "size": 50,
+                    "default": null
+                },
+                {
+                    "key": "created",
+                    "type": "string",
+                    "status": "available",
+                    "required": true,
+                    "array": false,
+                    "size": 50,
+                    "default": null
+                },
+                {
+                    "key": "text",
+                    "type": "string",
+                    "status": "available",
+                    "required": false,
+                    "array": false,
+                    "size": 255,
+                    "default": ""
+                }
+            ],
+            "indexes": [
+                {
+                    "key": "key_place_id_asc",
+                    "type": "key",
+                    "status": "available",
+                    "attributes": [
+                        "place_id"
+                    ],
+                    "orders": [
+                        "ASC"
+                    ]
+                },
+                {
+                    "key": "key_created_asc",
+                    "type": "key",
+                    "status": "available",
+                    "attributes": [
+                        "created"
+                    ],
+                    "orders": [
+                        "ASC"
+                    ]
+                },
+                {
+                    "key": "key_user_id_asc",
+                    "type": "key",
+                    "status": "available",
+                    "attributes": [
+                        "user_id"
+                    ],
+                    "orders": [
+                        "ASC"
+                    ]
+                }
+            ]
+        },
+        {
+            "$id": "votes",
+            "$read": [],
+            "$write": [],
+            "name": "Votes",
+            "enabled": true,
+            "permission": "collection",
+            "attributes": [
+                {
+                    "key": "place_id",
+                    "type": "string",
+                    "status": "available",
+                    "required": true,
+                    "array": false,
+                    "size": 50,
+                    "default": null
+                },
+                {
+                    "key": "user_id",
+                    "type": "string",
+                    "status": "available",
+                    "required": true,
+                    "array": false,
+                    "size": 50,
+                    "default": null
+                },
+                {
+                    "key": "created",
+                    "type": "string",
+                    "status": "available",
+                    "required": true,
+                    "array": false,
+                    "size": 50,
+                    "default": null
+                },
+                {
+                    "key": "value",
+                    "type": "integer",
+                    "status": "available",
+                    "required": true,
+                    "array": false,
+                    "min": -1,
+                    "max": 1,
+                    "default": null
+                }
+            ],
+            "indexes": [
+                {
+                    "key": "key_place_id_asc",
+                    "type": "key",
+                    "status": "available",
+                    "attributes": [
+                        "place_id"
+                    ],
+                    "orders": [
+                        "ASC"
+                    ]
+                }
+            ]
+        },
+        {
+            "$id": "photos",
+            "$read": [],
+            "$write": [],
+            "name": "Photos",
+            "enabled": true,
+            "permission": "collection",
+            "attributes": [
+                {
+                    "key": "place_id",
+                    "type": "string",
+                    "status": "available",
+                    "required": true,
+                    "array": false,
+                    "size": 50,
+                    "default": null
+                },
+                {
+                    "key": "user_id",
+                    "type": "string",
+                    "status": "available",
+                    "required": true,
+                    "array": false,
+                    "size": 50,
+                    "default": null
+                },
+                {
+                    "key": "file_id",
+                    "type": "string",
+                    "status": "available",
+                    "required": true,
+                    "array": false,
+                    "size": 50,
+                    "default": null
+                },
+                {
+                    "key": "created",
+                    "type": "string",
+                    "status": "available",
+                    "required": true,
+                    "array": false,
+                    "size": 50,
+                    "default": null
+                },
+                {
+                    "key": "text",
+                    "type": "string",
+                    "status": "available",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null
+                }
+            ],
+            "indexes": [
+                {
+                    "key": "key_place_id_asc",
+                    "type": "key",
+                    "status": "available",
+                    "attributes": [
+                        "place_id"
+                    ],
+                    "orders": [
+                        "ASC"
+                    ]
+                }
+            ]
+        }
+    ],
+    "functions": [
+        {
+            "$id": "create-user",
+            "name": "Create User",
+            "runtime": "node-16.0",
+            "path": "functions/Create User",
+            "entrypoint": "src/index.js",
+            "vars": {
+                "APPWRITE_FUNCTION_ENDPOINT": "",
+                "APPWRITE_FUNCTION_API_KEY": ""
+            },
+            "execute": [],
+            "events": [
+                "account.create"
+            ],
+            "schedule": "",
+            "timeout": 15
+        }
+    ]
+}
