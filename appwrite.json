@@ -4,22 +4,14 @@
     "collections": [
         {
             "$id": "places",
-            "$read": ["role:all"],
+            "$read": [
+                "role:all"
+            ],
             "$write": [],
             "name": "Places",
             "enabled": true,
             "permission": "collection",
             "attributes": [
-                {
-                    "key": "latitude",
-                    "type": "double",
-                    "status": "available",
-                    "required": true,
-                    "array": false,
-                    "min": -90,
-                    "max": 90,
-                    "default": null
-                },
                 {
                     "key": "longitude",
                     "type": "double",
@@ -31,12 +23,13 @@
                     "default": null
                 },
                 {
-                    "key": "status",
-                    "type": "string",
+                    "key": "latitude",
+                    "type": "double",
                     "status": "available",
                     "required": true,
                     "array": false,
-                    "size": 50,
+                    "min": -90,
+                    "max": 90,
                     "default": null
                 }
             ],
@@ -65,7 +58,7 @@
             "permission": "collection",
             "attributes": [
                 {
-                    "key": "user_id",
+                    "key": "created",
                     "type": "string",
                     "status": "available",
                     "required": true,
@@ -74,13 +67,12 @@
                     "default": null
                 },
                 {
-                    "key": "latitude",
-                    "type": "double",
+                    "key": "user_id",
+                    "type": "string",
                     "status": "available",
                     "required": true,
                     "array": false,
-                    "min": -90,
-                    "max": 90,
+                    "size": 50,
                     "default": null
                 },
                 {
@@ -94,16 +86,28 @@
                     "default": null
                 },
                 {
-                    "key": "created",
-                    "type": "string",
+                    "key": "latitude",
+                    "type": "double",
                     "status": "available",
                     "required": true,
                     "array": false,
-                    "size": 50,
+                    "min": -90,
+                    "max": 90,
                     "default": null
                 }
             ],
             "indexes": [
+                {
+                    "key": "key_created_asc",
+                    "type": "key",
+                    "status": "available",
+                    "attributes": [
+                        "created"
+                    ],
+                    "orders": [
+                        "ASC"
+                    ]
+                },
                 {
                     "key": "unique_latitude_asc_longitude_asc",
                     "type": "unique",
@@ -114,17 +118,6 @@
                     ],
                     "orders": [
                         "ASC",
-                        "ASC"
-                    ]
-                },
-                {
-                    "key": "key_created_asc",
-                    "type": "key",
-                    "status": "available",
-                    "attributes": [
-                        "created"
-                    ],
-                    "orders": [
                         "ASC"
                     ]
                 },
@@ -143,12 +136,23 @@
         },
         {
             "$id": "comments",
-            "$read": ["role:all"],
+            "$read": [
+                "role:all"
+            ],
             "$write": [],
             "name": "Comments",
             "enabled": true,
             "permission": "collection",
             "attributes": [
+                {
+                    "key": "created",
+                    "type": "string",
+                    "status": "available",
+                    "required": true,
+                    "array": false,
+                    "size": 50,
+                    "default": null
+                },
                 {
                     "key": "place_id",
                     "type": "string",
@@ -168,25 +172,27 @@
                     "default": null
                 },
                 {
-                    "key": "created",
-                    "type": "string",
-                    "status": "available",
-                    "required": true,
-                    "array": false,
-                    "size": 50,
-                    "default": null
-                },
-                {
                     "key": "text",
                     "type": "string",
                     "status": "available",
                     "required": false,
                     "array": false,
                     "size": 255,
-                    "default": ""
+                    "default": null
                 }
             ],
             "indexes": [
+                {
+                    "key": "key_user_id_asc",
+                    "type": "key",
+                    "status": "available",
+                    "attributes": [
+                        "user_id"
+                    ],
+                    "orders": [
+                        "ASC"
+                    ]
+                },
                 {
                     "key": "key_place_id_asc",
                     "type": "key",
@@ -208,17 +214,6 @@
                     "orders": [
                         "ASC"
                     ]
-                },
-                {
-                    "key": "key_user_id_asc",
-                    "type": "key",
-                    "status": "available",
-                    "attributes": [
-                        "user_id"
-                    ],
-                    "orders": [
-                        "ASC"
-                    ]
                 }
             ]
         },
@@ -231,16 +226,17 @@
             "permission": "collection",
             "attributes": [
                 {
-                    "key": "place_id",
-                    "type": "string",
+                    "key": "value",
+                    "type": "integer",
                     "status": "available",
                     "required": true,
                     "array": false,
-                    "size": 50,
+                    "min": -1,
+                    "max": 1,
                     "default": null
                 },
                 {
-                    "key": "user_id",
+                    "key": "place_id",
                     "type": "string",
                     "status": "available",
                     "required": true,
@@ -258,13 +254,12 @@
                     "default": null
                 },
                 {
-                    "key": "value",
-                    "type": "integer",
+                    "key": "user_id",
+                    "type": "string",
                     "status": "available",
                     "required": true,
                     "array": false,
-                    "min": -1,
-                    "max": 1,
+                    "size": 50,
                     "default": null
                 }
             ],
@@ -284,23 +279,16 @@
         },
         {
             "$id": "photos",
-            "$read": ["role:all"],
+            "$read": [
+                "role:all"
+            ],
             "$write": [],
             "name": "Photos",
             "enabled": true,
             "permission": "collection",
             "attributes": [
                 {
-                    "key": "place_id",
-                    "type": "string",
-                    "status": "available",
-                    "required": true,
-                    "array": false,
-                    "size": 50,
-                    "default": null
-                },
-                {
-                    "key": "user_id",
+                    "key": "created",
                     "type": "string",
                     "status": "available",
                     "required": true,
@@ -318,7 +306,16 @@
                     "default": null
                 },
                 {
-                    "key": "created",
+                    "key": "place_id",
+                    "type": "string",
+                    "status": "available",
+                    "required": true,
+                    "array": false,
+                    "size": 50,
+                    "default": null
+                },
+                {
+                    "key": "user_id",
                     "type": "string",
                     "status": "available",
                     "required": true,
@@ -351,6 +348,28 @@
                     ]
                 }
             ]
+        },
+        {
+            "$id": "users",
+            "$read": [
+                "role:all"
+            ],
+            "$write": [],
+            "name": "Users",
+            "enabled": true,
+            "permission": "collection",
+            "attributes": [
+                {
+                    "key": "name",
+                    "type": "string",
+                    "status": "available",
+                    "required": true,
+                    "array": false,
+                    "size": 50,
+                    "default": null
+                }
+            ],
+            "indexes": []
         }
     ],
     "functions": [
@@ -398,7 +417,9 @@
                 "APPWRITE_FUNCTION_ENDPOINT": "",
                 "APPWRITE_FUNCTION_API_KEY": ""
             },
-            "execute": ["role:all"],
+            "execute": [
+                "role:all"
+            ],
             "events": [],
             "schedule": "",
             "timeout": 15
@@ -414,7 +435,9 @@
                 "APPWRITE_FUNCTION_API_KEY": ""
             },
             "execute": [],
-            "events": ["storage.files.create"],
+            "events": [
+                "storage.files.create"
+            ],
             "schedule": "",
             "timeout": 15
         }

@@ -13,7 +13,6 @@ const Collections = {
 
 const Attributes = {
   Places: {
-    Status: "status",
     Latitude: "latitude",
     Longitude: "longitude",
   },
@@ -132,7 +131,6 @@ export const appwriteApi = createApi({
             Collections.Places,
             UNIQUE_ID,
             {
-              [Attributes.Places.Status]: "submitted",
               [Attributes.Places.Latitude]: args.lat,
               [Attributes.Places.Longitude]: args.long,
             }
