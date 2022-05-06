@@ -1,21 +1,21 @@
-import * as React from "react";
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
-import MenuItem from "@mui/material/MenuItem";
-import Menu from "@mui/material/Menu";
-import MenuIcon from "@mui/icons-material/Menu";
-import AccountCircle from "@mui/icons-material/AccountCircle";
-import Search from "./Search";
+import React from "react";
+import {
+  AppBar,
+  Avatar,
+  Box,
+  Toolbar,
+  IconButton,
+  Typography,
+  MenuItem,
+  Menu,
+} from "@mui/material";
+import { AccountCircle } from "@mui/icons-material";
+import { Search } from "./Search";
 import { AuthDialog } from "../auth-dialog/AuthDialog";
 import {
-  sdk,
   useDeleteSessionMutation,
   useGetAccountQuery,
 } from "../../services/appwrite";
-import { Avatar } from "@mui/material";
 import { useAppDispatch } from "../../app/hooks";
 import { setIsAdding } from "../places/placesSlice";
 
@@ -24,11 +24,7 @@ export function PlacesAppBar() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const isMenuOpen = Boolean(anchorEl);
   const [open, setOpen] = React.useState(false);
-  const {
-    data: account,
-    isLoading: getAccountIsLoading,
-    error: getAccountError,
-  } = useGetAccountQuery();
+  const { data: account } = useGetAccountQuery();
   const [deleteSession] = useDeleteSessionMutation();
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -75,21 +71,10 @@ export function PlacesAppBar() {
     </Menu>
   );
 
-  const mobileMenuId = "primary-search-account-menu-mobile";
-
   return (
     <>
       <AppBar position="absolute" sx={{ width: "100%" }}>
         <Toolbar>
-          {/* <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="open drawer"
-            sx={{ mr: 2 }}
-          >
-            <MenuIcon />
-          </IconButton> */}
           <Typography
             variant="h6"
             noWrap

@@ -24,20 +24,12 @@ export function PhotosTab(props: { place: Place | null }) {
   const matchesSmall = useMediaQuery(theme.breakpoints.up("sm"));
   const matchesLarge = useMediaQuery(theme.breakpoints.up("lg"));
   const placeId = props.place?.$id || "";
-  const {
-    data: account,
-    isLoading: getAccountIsLoading,
-    error: getAccountError,
-  } = useGetAccountQuery();
-  const {
-    data: photos,
-    isLoading: getPhotosIsLoading,
-    error: getPhotosError,
-  } = useGetPhotosQuery(
+  const { data: account } = useGetAccountQuery();
+  const { data: photos, isLoading: getPhotosIsLoading } = useGetPhotosQuery(
     {
       place_id: placeId,
     },
-    { skip: placeId == "" }
+    { skip: placeId === "" }
   );
   const [uploadPhoto] = useUploadPhotoMutation();
 
@@ -46,13 +38,9 @@ export function PhotosTab(props: { place: Place | null }) {
     userIds.add(p.user_id);
   });
 
-  const {
-    data: users,
-    isLoading: getUsersIsLoading,
-    error: getUsersError,
-  } = useGetUsersQuery(
+  const { data: users, isLoading: getUsersIsLoading } = useGetUsersQuery(
     { user_ids: Array.from(userIds) },
-    { skip: userIds.size == 0 }
+    { skip: userIds.size === 0 }
   );
 
   if (getPhotosIsLoading || getUsersIsLoading)

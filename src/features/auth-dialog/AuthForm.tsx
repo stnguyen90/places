@@ -1,13 +1,16 @@
-import * as React from "react";
-import Box from "@mui/material/Box";
-import IconButton from "@mui/material/IconButton";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import InputLabel from "@mui/material/InputLabel";
-import InputAdornment from "@mui/material/InputAdornment";
-import FormControl from "@mui/material/FormControl";
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import { Alert, Button, Typography } from "@mui/material";
+import React from "react";
+import {
+  Alert,
+  Box,
+  Button,
+  Typography,
+  IconButton,
+  OutlinedInput,
+  InputLabel,
+  InputAdornment,
+  FormControl,
+} from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import {
   useCreateAccountMutation,
   useCreateSessionMutation,
@@ -109,12 +112,6 @@ export default function AuthForm(props: { onComplete: Function }) {
 
   return (
     <>
-      {/* <Box>
-        <TextField id="email" label="Email"></TextField>
-      </Box>
-      <Box>
-        <TextField id="password" label="Password"></TextField>
-      </Box> */}
       <Typography variant="h5" sx={{ my: 2, mx: 1 }}>
         {isSignUp ? "Sign Up" : "Log In"}
       </Typography>

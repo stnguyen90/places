@@ -1,20 +1,10 @@
+import React from "react";
 import { Fab } from "@mui/material";
-import { LatLngBounds } from "leaflet";
-import { useEffect } from "react";
 import { Marker, useMap } from "react-leaflet";
 import { AddLocation, Cancel } from "@mui/icons-material";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { useCreatePlaceMutation } from "../../services/appwrite";
 import { selectPosition, setPosition, setIsAdding } from "./placesSlice";
-
-const getBounds = (b: LatLngBounds) => {
-  return {
-    minLat: b.getSouth(),
-    maxLat: b.getNorth(),
-    minLong: b.getWest(),
-    maxLong: b.getEast(),
-  };
-};
 
 export function AddPlace() {
   const map = useMap();
@@ -22,11 +12,11 @@ export function AddPlace() {
   const position = useAppSelector(selectPosition);
   const [createPlace] = useCreatePlaceMutation();
 
-  useEffect(() => {
+  React.useEffect(() => {
     map.panTo([position.posLat, position.posLong]);
   }, [position.posLat, position.posLong]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     map.on("move", () => {
       const center = map.getCenter();
 

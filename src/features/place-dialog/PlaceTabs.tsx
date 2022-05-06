@@ -1,8 +1,5 @@
-import * as React from "react";
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
-import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
+import React from "react";
+import { Box, Tab, Tabs } from "@mui/material";
 import { Place } from "../../services/types";
 import { CommentsTab } from "./CommentsTab";
 import { PhotosTab } from "./PhotosTab";

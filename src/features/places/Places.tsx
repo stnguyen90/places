@@ -1,8 +1,8 @@
+import React from "react";
 import { MyLocation } from "@mui/icons-material";
 import { Alert, CircularProgress, Fab } from "@mui/material";
 import { LatLngBounds } from "leaflet";
-import { useEffect, useState } from "react";
-import { Marker, Popup, useMap } from "react-leaflet";
+import { Marker, useMap } from "react-leaflet";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { useGetPlacesQuery } from "../../services/appwrite";
 import { Place } from "../../services/types";
@@ -10,7 +10,6 @@ import { PlaceDialog } from "../place-dialog/PlaceDialog";
 import {
   selectBounds,
   selectPosition,
-  selectIsAdding,
   setBounds,
   setPosition,
 } from "./placesSlice";
@@ -25,26 +24,26 @@ const getBounds = (b: LatLngBounds) => {
 };
 
 export function Places() {
-  const [open, setOpen] = useState(false);
-  const [selectedPlace, selectPlace] = useState<Place | null>(null);
+  const [open, setOpen] = React.useState(false);
+  const [selectedPlace, selectPlace] = React.useState<Place | null>(null);
   const map = useMap();
   const dispatch = useAppDispatch();
   const bounds = useAppSelector(selectBounds);
   const position = useAppSelector(selectPosition);
   const noBounds =
-    bounds.minLat == 0 &&
-    bounds.maxLat == 0 &&
-    bounds.minLong == 0 &&
-    bounds.maxLong == 0;
+    bounds.minLat === 0 &&
+    bounds.maxLat === 0 &&
+    bounds.minLong === 0 &&
+    bounds.maxLong === 0;
   const { data, isLoading, error } = useGetPlacesQuery(bounds, {
     skip: noBounds,
   });
 
-  useEffect(() => {
+  React.useEffect(() => {
     map.panTo([position.posLat, position.posLong]);
   }, [position.posLat, position.posLong]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const updateBounds = () => {
       const b = map.getBounds();
       dispatch(setBounds(getBounds(b)));

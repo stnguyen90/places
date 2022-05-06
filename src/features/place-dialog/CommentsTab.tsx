@@ -9,7 +9,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
+import { Add } from "@mui/icons-material";
 import {
   useCreateCommentMutation,
   useGetAccountQuery,
@@ -20,21 +20,14 @@ import { Place, User } from "../../services/types";
 
 export function CommentsTab(props: { place: Place | null }) {
   const placeId = props.place?.$id || "";
-  const {
-    data: account,
-    isLoading: getAccountIsLoading,
-    error: getAccountError,
-  } = useGetAccountQuery();
-  const {
-    data: comments,
-    isLoading: getCommentsIsLoading,
-    error: getCommentsError,
-  } = useGetCommentsQuery(
-    {
-      place_id: placeId,
-    },
-    { skip: placeId == "" }
-  );
+  const { data: account } = useGetAccountQuery();
+  const { data: comments, isLoading: getCommentsIsLoading } =
+    useGetCommentsQuery(
+      {
+        place_id: placeId,
+      },
+      { skip: placeId === "" }
+    );
   const [isAdding, setIsAdding] = React.useState(false);
   const [comment, setComment] = React.useState("");
   const [createComment] = useCreateCommentMutation();
@@ -44,13 +37,9 @@ export function CommentsTab(props: { place: Place | null }) {
     userIds.add(c.user_id);
   });
 
-  const {
-    data: users,
-    isLoading: getUsersIsLoading,
-    error: getUsersError,
-  } = useGetUsersQuery(
+  const { data: users, isLoading: getUsersIsLoading } = useGetUsersQuery(
     { user_ids: Array.from(userIds) },
-    { skip: userIds.size == 0 }
+    { skip: userIds.size === 0 }
   );
 
   if (getCommentsIsLoading || getUsersIsLoading)
@@ -94,7 +83,7 @@ export function CommentsTab(props: { place: Place | null }) {
         <ListItemText sx={{ pl: 2 }}>
           {!isAdding ? (
             <Button
-              startIcon={<AddIcon />}
+              startIcon={<Add />}
               onClick={() => {
                 setIsAdding(true);
               }}

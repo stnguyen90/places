@@ -2,7 +2,6 @@ import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
 import { Appwrite, Models, Query } from "appwrite";
 import { Comment, Photo, Place, User } from "./types";
 
-// Init your Web SDK
 export const sdk = new Appwrite();
 
 const Collections = {

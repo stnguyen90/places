@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import AuthForm from "./AuthForm";
@@ -25,8 +25,6 @@ export function AuthDialog(props: {
 
   return (
     <div>
-      {/* <Button onClick={handleClickOpen("paper")}>scroll=paper</Button>
-       <Button onClick={handleClickOpen("body")}>scroll=body</Button> */}
       <Dialog
         open={open}
         onClose={handleClose}
@@ -38,9 +36,6 @@ export function AuthDialog(props: {
         <DialogContent dividers={false}>
           <AuthForm onComplete={handleClose} />
         </DialogContent>
-        {/* <DialogActions>
-          <Button onClick={handleClose}>Close</Button>
-        </DialogActions> */}
       </Dialog>
     </div>
   );

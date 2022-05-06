@@ -1,8 +1,5 @@
-import * as React from "react";
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
+import React from "react";
+import { Button, Dialog, DialogActions, DialogContent } from "@mui/material";
 import { Place } from "../../services/types";
 import { PlaceTabs } from "./PlaceTabs";
 
@@ -29,8 +26,6 @@ export function PlaceDialog(props: {
 
   return (
     <div>
-      {/* <Button onClick={handleClickOpen("paper")}>scroll=paper</Button>
-       <Button onClick={handleClickOpen("body")}>scroll=body</Button> */}
       <Dialog
         open={open}
         onClose={handleClose}
@@ -47,9 +42,6 @@ export function PlaceDialog(props: {
           <Button onClick={handleClose} variant="outlined">
             Close
           </Button>
-          {/* <Button onClick={handleClose} variant="contained">
-            Add Comment
-          </Button> */}
         </DialogActions>
       </Dialog>
     </div>

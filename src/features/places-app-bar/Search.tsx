@@ -1,10 +1,12 @@
-import * as React from "react";
+import React from "react";
 import { styled, alpha } from "@mui/material/styles";
-import TextField from "@mui/material/TextField";
-import Autocomplete from "@mui/material/Autocomplete";
-import CircularProgress from "@mui/material/CircularProgress";
+import {
+  Autocomplete,
+  CircularProgress,
+  InputAdornment,
+  TextField,
+} from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import { InputAdornment } from "@mui/material";
 import { setPosition } from "../places/placesSlice";
 import { useAppDispatch } from "../../app/hooks";
 
@@ -37,7 +39,7 @@ interface OSMPlace {
   lon: number;
 }
 
-export default function Search() {
+export function Search() {
   const dispatch = useAppDispatch();
   const [open, setOpen] = React.useState(false);
   const [options, setOptions] = React.useState<OSMPlace[]>([]);
