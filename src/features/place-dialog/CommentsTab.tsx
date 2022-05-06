@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  Alert,
   Box,
   Button,
   CircularProgress,
@@ -12,7 +13,6 @@ import {
 import { Add } from "@mui/icons-material";
 import {
   useCreateCommentMutation,
-  useGetAccountQuery,
   useGetCommentsQuery,
   useGetUsersQuery,
 } from "../../services/appwrite";
@@ -20,7 +20,6 @@ import { Place, User } from "../../services/types";
 
 export function CommentsTab(props: { place: Place | null }) {
   const placeId = props.place?.$id || "";
-  const { data: account } = useGetAccountQuery();
   const { data: comments, isLoading: getCommentsIsLoading } =
     useGetCommentsQuery(
       {
@@ -30,7 +29,7 @@ export function CommentsTab(props: { place: Place | null }) {
     );
   const [isAdding, setIsAdding] = React.useState(false);
   const [comment, setComment] = React.useState("");
-  const [createComment] = useCreateCommentMutation();
+  const [createComment, createCommentResult] = useCreateCommentMutation();
 
   const userIds = new Set<string>();
   comments?.forEach((c) => {
@@ -63,22 +62,30 @@ export function CommentsTab(props: { place: Place | null }) {
     setComment(event.target.value);
   };
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = async (
+    event: React.KeyboardEvent<HTMLInputElement>
+  ) => {
     if (event.key === "Enter") {
-      setIsAdding(false);
-
-      createComment({
-        place_id: placeId,
-        text: comment,
-        user_id: account?.$id || "",
-      });
-
-      setComment("");
+      try {
+        await createComment({
+          place_id: placeId,
+          text: comment,
+        }).unwrap();
+        setComment("");
+        setIsAdding(false);
+      } catch (e) {}
     }
   };
 
   return (
     <List>
+      {createCommentResult.isError && (
+        <ListItem>
+          <ListItemText>
+            <Alert severity="error">{`${createCommentResult.error}`}</Alert>
+          </ListItemText>
+        </ListItem>
+      )}
       <ListItem divider disablePadding key="add-button">
         <ListItemText sx={{ pl: 2 }}>
           {!isAdding ? (
@@ -97,6 +104,7 @@ export function CommentsTab(props: { place: Place | null }) {
               size="small"
               onKeyDown={handleKeyDown}
               onChange={handleChange}
+              disabled={createCommentResult.isLoading}
             />
           )}
         </ListItemText>

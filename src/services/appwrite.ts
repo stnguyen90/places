@@ -41,6 +41,10 @@ export const Buckets = {
   Photos: "photos",
 } as const;
 
+const Functions = {
+  CreateComment: "create-comment",
+} as const;
+
 sdk
   .setEndpoint(process.env["REACT_APP_APPWRITE_ENDPOINT"] || "")
   .setProject(process.env["REACT_APP_APPWRITE_PROJECT_ID"] || "");
@@ -188,24 +192,30 @@ export const appwriteApi = createApi({
       },
     }),
     createComment: builder.mutation<
-      Models.Document,
-      { place_id: string; user_id: string; text: string }
+      Models.Execution,
+      { place_id: string; text: string }
     >({
       invalidatesTags: ["Comments"],
       queryFn: async (args) => {
         try {
-          const document = await sdk.database.createDocument(
-            Collections.Comments,
-            UNIQUE_ID,
-            {
-              [Attributes.Comments.Created]: new Date().toISOString(),
-              [Attributes.Comments.PlaceId]: args.place_id,
-              [Attributes.Comments.UserId]: args.user_id,
-              [Attributes.Comments.Text]: args.text,
-            }
+          const data = {
+            [Attributes.Comments.PlaceId]: args.place_id,
+            [Attributes.Comments.Text]: args.text,
+          };
+
+          const execution = await sdk.functions.createExecution(
+            Functions.CreateComment,
+            JSON.stringify(data),
+            false
           );
 
-          return { data: document };
+          if (execution.status === "completed") {
+            return { data: execution };
+          }
+
+          return {
+            error: execution.stderr,
+          };
         } catch (e) {
           return {
             error: e,

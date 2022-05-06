@@ -372,6 +372,23 @@
             ],
             "schedule": "",
             "timeout": 15
+        },
+        {
+            "$id": "create-comment",
+            "name": "Create Comment",
+            "runtime": "node-16.0",
+            "path": "functions/Create Comment",
+            "entrypoint": "src/index.js",
+            "vars": {
+                "APPWRITE_FUNCTION_ENDPOINT": "",
+                "APPWRITE_FUNCTION_API_KEY": ""
+            },
+            "execute": [
+                "role:all"
+            ],
+            "events": [],
+            "schedule": "",
+            "timeout": 15
         }
     ]
 }
