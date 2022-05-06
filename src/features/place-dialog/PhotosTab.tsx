@@ -1,5 +1,7 @@
+import { PhotoCamera } from "@mui/icons-material";
 import {
   Box,
+  Button,
   CircularProgress,
   ImageList as Masonry,
   ImageListItem,
@@ -8,9 +10,12 @@ import {
   useTheme,
 } from "@mui/material";
 import {
+  Buckets,
   sdk,
+  useGetAccountQuery,
   useGetPhotosQuery,
   useGetUsersQuery,
+  useUploadPhotoMutation,
 } from "../../services/appwrite";
 import { Place, User } from "../../services/types";
 
@@ -19,6 +24,11 @@ export function PhotosTab(props: { place: Place | null }) {
   const matchesSmall = useMediaQuery(theme.breakpoints.up("sm"));
   const matchesLarge = useMediaQuery(theme.breakpoints.up("lg"));
   const placeId = props.place?.$id || "";
+  const {
+    data: account,
+    isLoading: getAccountIsLoading,
+    error: getAccountError,
+  } = useGetAccountQuery();
   const {
     data: photos,
     isLoading: getPhotosIsLoading,
@@ -29,6 +39,7 @@ export function PhotosTab(props: { place: Place | null }) {
     },
     { skip: placeId == "" }
   );
+  const [uploadPhoto] = useUploadPhotoMutation();
 
   const userIds = new Set<string>();
   photos?.forEach((p) => {
@@ -68,33 +79,75 @@ export function PhotosTab(props: { place: Place | null }) {
     cols = 2;
   }
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      uploadPhoto({
+        file: files[0],
+        place_id: placeId,
+        user_id: account?.$id || "",
+        text: "",
+      });
+    }
+  };
+
+  const uploadButton = (
+    <Box
+      sx={{ py: 8 }}
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+    >
+      <label htmlFor="upload-button">
+        <input
+          style={{ display: "none" }}
+          accept="image/*"
+          id="upload-button"
+          type="file"
+          onChange={handleChange}
+        />
+        <Button
+          variant="contained"
+          aria-label="upload picture"
+          component="span"
+          startIcon={<PhotoCamera />}
+        >
+          Upload
+        </Button>
+      </label>
+    </Box>
+  );
+
+  if (!photos || photos.length === 0) {
+    return uploadButton;
+  }
+
   return (
-    <Masonry cols={cols} gap={4}>
-      {(photos || []).map((p) => {
-        const name = usersMap.get(p.user_id)?.name || "John Doe";
+    <>
+      <Masonry cols={cols} gap={4}>
+        {uploadButton}
 
-        const date = new Date(p.created);
-        const day = date.toLocaleDateString();
-        const time = date.toLocaleTimeString();
+        {(photos || []).map((p) => {
+          const name = usersMap.get(p.user_id)?.name || "John Doe";
 
-        const url = sdk.storage.getFileView("photos", p.file_id);
+          const date = new Date(p.created);
+          const day = date.toLocaleDateString();
+          const time = date.toLocaleTimeString();
 
-        return (
-          <ImageListItem key={p.$id}>
-            <img
-              src={`${url}`}
-              // srcSet={`${item.img}?w=248&fit=crop&auto=format&dpr=2 2x`}
-              alt={p.text}
-              loading="lazy"
-            />
-            <ImageListItemBar
-              position="below"
-              title={name}
-              subtitle={`${day} ${time}`}
-            />
-          </ImageListItem>
-        );
-      })}
-    </Masonry>
+          const url = sdk.storage.getFileView(Buckets.Photos, p.file_id);
+
+          return (
+            <ImageListItem key={p.$id}>
+              <img src={`${url}`} alt={p.text} loading="lazy" />
+              <ImageListItemBar
+                position="below"
+                title={name}
+                subtitle={`${day} ${time}`}
+              />
+            </ImageListItem>
+          );
+        })}
+      </Masonry>
+    </>
   );
 }

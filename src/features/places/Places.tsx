@@ -1,4 +1,5 @@
-import { Alert, CircularProgress } from "@mui/material";
+import { MyLocation } from "@mui/icons-material";
+import { Alert, CircularProgress, Fab } from "@mui/material";
 import { LatLngBounds } from "leaflet";
 import { useEffect, useState } from "react";
 import { Marker, Popup, useMap } from "react-leaflet";
@@ -9,6 +10,7 @@ import { PlaceDialog } from "../place-dialog/PlaceDialog";
 import {
   selectBounds,
   selectPosition,
+  selectIsAdding,
   setBounds,
   setPosition,
 } from "./placesSlice";
@@ -26,16 +28,16 @@ export function Places() {
   const [open, setOpen] = useState(false);
   const [selectedPlace, selectPlace] = useState<Place | null>(null);
   const map = useMap();
-
   const dispatch = useAppDispatch();
   const bounds = useAppSelector(selectBounds);
   const position = useAppSelector(selectPosition);
+  const noBounds =
+    bounds.minLat == 0 &&
+    bounds.maxLat == 0 &&
+    bounds.minLong == 0 &&
+    bounds.maxLong == 0;
   const { data, isLoading, error } = useGetPlacesQuery(bounds, {
-    skip:
-      bounds.minLat == 0 &&
-      bounds.maxLat == 0 &&
-      bounds.minLong == 0 &&
-      bounds.maxLong == 0,
+    skip: noBounds,
   });
 
   useEffect(() => {
@@ -43,31 +45,31 @@ export function Places() {
   }, [position.posLat, position.posLong]);
 
   useEffect(() => {
-    map.locate().on("locationfound", (e) => {
-      dispatch(setBounds(getBounds(e.bounds)));
+    const updateBounds = () => {
+      const b = map.getBounds();
+      dispatch(setBounds(getBounds(b)));
+    };
+
+    if (noBounds) {
+      updateBounds();
+    }
+
+    map.on("moveend", () => {
+      updateBounds();
+
+      const center = map.getCenter();
       dispatch(
         setPosition({
-          posLat: e.latlng.lat,
-          posLong: e.latlng.lng,
+          posLat: center.lat,
+          posLong: center.lng,
         })
       );
-      map.panTo(e.latlng);
     });
-  }, []);
 
-  useEffect(() => {
-    map.on("moveend", () => {
-      const b = map.getBounds();
-      dispatch(setBounds(getBounds(b)));
-    });
-  }, []);
-
-  useEffect(() => {
     map.on("resize", () => {
-      const b = map.getBounds();
-      dispatch(setBounds(getBounds(b)));
+      updateBounds();
     });
-  }, []);
+  });
 
   if (isLoading) {
     return <CircularProgress />;
@@ -80,6 +82,25 @@ export function Places() {
   if (!data) {
     return null;
   }
+
+  const fabStyle = {
+    position: "absolute",
+    bottom: 40,
+    right: 32,
+  };
+
+  const handleClick = () => {
+    map.locate().on("locationfound", (e) => {
+      dispatch(setBounds(getBounds(e.bounds)));
+      dispatch(
+        setPosition({
+          posLat: e.latlng.lat,
+          posLong: e.latlng.lng,
+        })
+      );
+      map.panTo(e.latlng);
+    });
+  };
 
   return (
     <>
@@ -102,6 +123,15 @@ export function Places() {
         setOpen={setOpen}
         place={selectedPlace}
       ></PlaceDialog>
+      <Fab
+        size="large"
+        sx={fabStyle}
+        color="primary"
+        aria-label="add"
+        onClick={handleClick}
+      >
+        <MyLocation />
+      </Fab>
     </>
   );
 }

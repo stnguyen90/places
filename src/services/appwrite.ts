@@ -14,6 +14,7 @@ const Collections = {
 
 const Attributes = {
   Places: {
+    Status: "status",
     Latitude: "latitude",
     Longitude: "longitude",
   },
@@ -35,6 +36,12 @@ const Attributes = {
   },
 } as const;
 
+const UNIQUE_ID = "unique()";
+
+export const Buckets = {
+  Photos: "photos",
+} as const;
+
 sdk
   .setEndpoint(process.env["REACT_APP_APPWRITE_ENDPOINT"] || "")
   .setProject(process.env["REACT_APP_APPWRITE_PROJECT_ID"] || "");
@@ -50,7 +57,7 @@ export const appwriteApi = createApi({
       queryFn: async (args) => {
         try {
           const account = await sdk.account.create(
-            "unique()",
+            UNIQUE_ID,
             args.email,
             args.password,
             args.name
@@ -87,7 +94,7 @@ export const appwriteApi = createApi({
       invalidatesTags: ["Account"],
       queryFn: async () => {
         try {
-          await sdk.account.deleteSession("");
+          await sdk.account.deleteSession("current");
 
           return { data: null };
         } catch (e) {
@@ -106,6 +113,29 @@ export const appwriteApi = createApi({
         } catch (e) {
           return {
             data: null,
+          };
+        }
+      },
+    }),
+    createPlace: builder.mutation<
+      Models.Document,
+      { lat: number; long: number }
+    >({
+      queryFn: async (args) => {
+        try {
+          const doc = await sdk.database.createDocument(
+            Collections.Places,
+            UNIQUE_ID,
+            {
+              [Attributes.Places.Status]: "submitted",
+              [Attributes.Places.Latitude]: args.lat,
+              [Attributes.Places.Longitude]: args.long,
+            }
+          );
+          return { data: doc };
+        } catch (e) {
+          return {
+            error: e,
           };
         }
       },
@@ -166,13 +196,13 @@ export const appwriteApi = createApi({
       queryFn: async (args) => {
         try {
           const document = await sdk.database.createDocument(
-            "comments",
-            "unique()",
+            Collections.Comments,
+            UNIQUE_ID,
             {
-              created: new Date().toISOString(),
-              place_id: args.place_id,
-              user_id: args.user_id,
-              text: args.text,
+              [Attributes.Comments.Created]: new Date().toISOString(),
+              [Attributes.Comments.PlaceId]: args.place_id,
+              [Attributes.Comments.UserId]: args.user_id,
+              [Attributes.Comments.Text]: args.text,
             }
           );
 
@@ -200,10 +230,43 @@ export const appwriteApi = createApi({
             undefined, // offset
             undefined, // cursor
             undefined, // cursorDirection
-            ["created"], // orderAttributes
+            [Attributes.Comments.Created], // orderAttributes
             ["DESC"] // orderTypes
           );
           return { data: documentList.documents };
+        } catch (e) {
+          return {
+            error: e,
+          };
+        }
+      },
+    }),
+    uploadPhoto: builder.mutation<
+      Models.File,
+      {
+        file: File;
+        place_id: string;
+        user_id: string;
+        text: string;
+      }
+    >({
+      invalidatesTags: ["Photos"],
+      queryFn: async (args) => {
+        try {
+          const file = await sdk.storage.createFile(
+            Buckets.Photos,
+            UNIQUE_ID,
+            args.file
+          );
+
+          await sdk.database.createDocument(Collections.Photos, UNIQUE_ID, {
+            [Attributes.Photos.Created]: new Date().toISOString(),
+            [Attributes.Photos.FileId]: file.$id,
+            [Attributes.Photos.PlaceId]: args.place_id,
+            [Attributes.Photos.UserId]: args.user_id,
+            [Attributes.Photos.Text]: args.text,
+          });
+          return { data: file };
         } catch (e) {
           return {
             error: e,
@@ -217,6 +280,7 @@ export const appwriteApi = createApi({
         place_id: string;
       }
     >({
+      providesTags: ["Photos"],
       queryFn: async (arg) => {
         try {
           const documentList = await sdk.database.listDocuments<Photo>(
@@ -226,7 +290,7 @@ export const appwriteApi = createApi({
             undefined, // offset
             undefined, // cursor
             undefined, // cursorDirection
-            ["created"], // orderAttributes
+            [Attributes.Photos.Created], // orderAttributes
             ["DESC"] // orderTypes
           );
           return { data: documentList.documents };
@@ -247,9 +311,11 @@ export const {
   useCreateSessionMutation,
   useDeleteSessionMutation,
   useGetAccountQuery,
+  useCreatePlaceMutation,
   useGetPlacesQuery,
   useGetUsersQuery,
   useCreateCommentMutation,
   useGetCommentsQuery,
+  useUploadPhotoMutation,
   useGetPhotosQuery,
 } = appwriteApi;

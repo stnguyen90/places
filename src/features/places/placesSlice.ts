@@ -13,7 +13,9 @@ export interface Position {
   posLong: number;
 }
 
-export interface PlacesState extends Bounds, Position {}
+export interface PlacesState extends Bounds, Position {
+  isAdding: boolean;
+}
 
 const initialState: PlacesState = {
   minLat: 0,
@@ -22,6 +24,7 @@ const initialState: PlacesState = {
   maxLong: 0,
   posLat: 51.505,
   posLong: -0.09,
+  isAdding: false,
 };
 
 export const placesSlice = createSlice({
@@ -38,10 +41,13 @@ export const placesSlice = createSlice({
       state.posLat = action.payload.posLat;
       state.posLong = action.payload.posLong;
     },
+    setIsAdding: (state, action: PayloadAction<{ isAdding: boolean }>) => {
+      state.isAdding = action.payload.isAdding;
+    },
   },
 });
 
-export const { setBounds, setPosition } = placesSlice.actions;
+export const { setBounds, setPosition, setIsAdding } = placesSlice.actions;
 
 export const selectBounds = (state: RootState) => {
   return {
@@ -54,6 +60,10 @@ export const selectBounds = (state: RootState) => {
 
 export const selectPosition = (state: RootState) => {
   return { posLat: state.places.posLat, posLong: state.places.posLong };
+};
+
+export const selectIsAdding = (state: RootState) => {
+  return state.places.isAdding;
 };
 
 export default placesSlice.reducer;

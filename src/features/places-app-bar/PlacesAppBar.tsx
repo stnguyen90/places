@@ -16,8 +16,11 @@ import {
   useGetAccountQuery,
 } from "../../services/appwrite";
 import { Avatar } from "@mui/material";
+import { useAppDispatch } from "../../app/hooks";
+import { setIsAdding } from "../places/placesSlice";
 
 export function PlacesAppBar() {
+  const dispatch = useAppDispatch();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const isMenuOpen = Boolean(anchorEl);
   const [open, setOpen] = React.useState(false);
@@ -38,6 +41,11 @@ export function PlacesAppBar() {
 
   const handleAuthDialogOpen = () => {
     setOpen(true);
+  };
+
+  const handleAddPlace = () => {
+    dispatch(setIsAdding({ isAdding: true }));
+    handleMenuClose();
   };
 
   const handleLogOut = async () => {
@@ -62,7 +70,7 @@ export function PlacesAppBar() {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      {/* <MenuItem onClick={handleLogOut}>Add a Place</MenuItem> */}
+      <MenuItem onClick={handleAddPlace}>Add a Place</MenuItem>
       <MenuItem onClick={handleLogOut}>Log Out</MenuItem>
     </Menu>
   );
