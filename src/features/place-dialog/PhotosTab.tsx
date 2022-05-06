@@ -1,5 +1,6 @@
 import { PhotoCamera } from "@mui/icons-material";
 import {
+  Alert,
   Box,
   Button,
   CircularProgress,
@@ -31,7 +32,7 @@ export function PhotosTab(props: { place: Place | null }) {
     },
     { skip: placeId === "" }
   );
-  const [uploadPhoto] = useUploadPhotoMutation();
+  const [uploadPhoto, uploadPhotoResult] = useUploadPhotoMutation();
 
   const userIds = new Set<string>();
   photos?.forEach((p) => {
@@ -98,7 +99,10 @@ export function PhotosTab(props: { place: Place | null }) {
           variant="contained"
           aria-label="upload picture"
           component="span"
-          startIcon={<PhotoCamera />}
+          startIcon={
+            uploadPhotoResult.isLoading ? <CircularProgress /> : <PhotoCamera />
+          }
+          disabled={uploadPhotoResult.isLoading}
         >
           Upload
         </Button>
@@ -112,6 +116,10 @@ export function PhotosTab(props: { place: Place | null }) {
 
   return (
     <>
+      {uploadPhotoResult.isError && (
+        <Alert severity="error">{`${uploadPhotoResult.error}`}</Alert>
+      )}
+
       <Masonry cols={cols} gap={4}>
         {uploadButton}
 

@@ -39,10 +39,12 @@ const UNIQUE_ID = "unique()";
 
 export const Buckets = {
   Photos: "photos",
+  PhotoUploads: "photo-uploads",
 } as const;
 
 const Functions = {
   CreateComment: "create-comment",
+  CreatePhoto: "create-photo",
 } as const;
 
 sdk
@@ -262,19 +264,31 @@ export const appwriteApi = createApi({
       invalidatesTags: ["Photos"],
       queryFn: async (args) => {
         try {
+          const data = {
+            [Attributes.Photos.PlaceId]: args.place_id,
+            [Attributes.Photos.Text]: args.text,
+          };
+
+          const execution = await sdk.functions.createExecution(
+            Functions.CreatePhoto,
+            JSON.stringify(data),
+            false
+          );
+
+          if (execution.status !== "completed") {
+            return {
+              error: execution.stderr,
+            };
+          }
+
+          const docId = execution.stdout;
+
           const file = await sdk.storage.createFile(
-            Buckets.Photos,
-            UNIQUE_ID,
+            Buckets.PhotoUploads,
+            docId,
             args.file
           );
 
-          await sdk.database.createDocument(Collections.Photos, UNIQUE_ID, {
-            [Attributes.Photos.Created]: new Date().toISOString(),
-            [Attributes.Photos.FileId]: file.$id,
-            [Attributes.Photos.PlaceId]: args.place_id,
-            [Attributes.Photos.UserId]: args.user_id,
-            [Attributes.Photos.Text]: args.text,
-          });
           return { data: file };
         } catch (e) {
           return {
@@ -294,7 +308,10 @@ export const appwriteApi = createApi({
         try {
           const documentList = await sdk.database.listDocuments<Photo>(
             Collections.Photos,
-            [Query.equal(Attributes.Comments.PlaceId, arg.place_id)],
+            [
+              Query.equal(Attributes.Photos.PlaceId, arg.place_id),
+              Query.notEqual(Attributes.Photos.FileId, ""),
+            ],
             undefined, // limit
             undefined, // offset
             undefined, // cursor

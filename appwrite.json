@@ -4,9 +4,7 @@
     "collections": [
         {
             "$id": "places",
-            "$read": [
-                "role:all"
-            ],
+            "$read": ["role:all"],
             "$write": [],
             "name": "Places",
             "enabled": true,
@@ -145,9 +143,7 @@
         },
         {
             "$id": "comments",
-            "$read": [
-                "role:all"
-            ],
+            "$read": ["role:all"],
             "$write": [],
             "name": "Comments",
             "enabled": true,
@@ -288,7 +284,7 @@
         },
         {
             "$id": "photos",
-            "$read": [],
+            "$read": ["role:all"],
             "$write": [],
             "name": "Photos",
             "enabled": true,
@@ -342,13 +338,15 @@
             ],
             "indexes": [
                 {
-                    "key": "key_place_id_asc",
+                    "key": "key_place_id_asc_file_id_asc",
                     "type": "key",
                     "status": "available",
                     "attributes": [
-                        "place_id"
+                        "place_id",
+                        "file_id"
                     ],
                     "orders": [
+                        "ASC",
                         "ASC"
                     ]
                 }
@@ -387,6 +385,36 @@
                 "role:all"
             ],
             "events": [],
+            "schedule": "",
+            "timeout": 15
+        },
+        {
+            "$id": "create-photo",
+            "name": "Create Photo",
+            "runtime": "node-16.0",
+            "path": "functions/Create Photo",
+            "entrypoint": "src/index.js",
+            "vars": {
+                "APPWRITE_FUNCTION_ENDPOINT": "",
+                "APPWRITE_FUNCTION_API_KEY": ""
+            },
+            "execute": ["role:all"],
+            "events": [],
+            "schedule": "",
+            "timeout": 15
+        },
+        {
+            "$id": "process-photo",
+            "name": "Process Photo",
+            "runtime": "node-16.0",
+            "path": "functions/Process Photo",
+            "entrypoint": "src/index.js",
+            "vars": {
+                "APPWRITE_FUNCTION_ENDPOINT": "",
+                "APPWRITE_FUNCTION_API_KEY": ""
+            },
+            "execute": [],
+            "events": ["storage.files.create"],
             "schedule": "",
             "timeout": 15
         }
