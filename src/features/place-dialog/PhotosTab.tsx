@@ -74,41 +74,47 @@ export function PhotosTab(props: { place: Place | null }) {
       uploadPhoto({
         file: files[0],
         place_id: placeId,
-        user_id: account?.$id || "",
         text: "",
       });
     }
   };
 
-  const uploadButton = (
-    <Box
-      sx={{ py: 8 }}
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-    >
-      <label htmlFor="upload-button">
-        <input
-          style={{ display: "none" }}
-          accept="image/*"
-          id="upload-button"
-          type="file"
-          onChange={handleChange}
-        />
-        <Button
-          variant="contained"
-          aria-label="upload picture"
-          component="span"
-          startIcon={
-            uploadPhotoResult.isLoading ? <CircularProgress /> : <PhotoCamera />
-          }
-          disabled={uploadPhotoResult.isLoading}
-        >
-          Upload
-        </Button>
-      </label>
-    </Box>
-  );
+  let uploadButton = null;
+  if (account) {
+    uploadButton = (
+      <Box
+        sx={{ py: 8 }}
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <label htmlFor="upload-button">
+          <input
+            style={{ display: "none" }}
+            accept="image/*"
+            id="upload-button"
+            type="file"
+            onChange={handleChange}
+          />
+          <Button
+            variant="contained"
+            aria-label="upload picture"
+            component="span"
+            startIcon={
+              uploadPhotoResult.isLoading ? (
+                <CircularProgress />
+              ) : (
+                <PhotoCamera />
+              )
+            }
+            disabled={uploadPhotoResult.isLoading}
+          >
+            Upload
+          </Button>
+        </label>
+      </Box>
+    );
+  }
 
   if (!photos || photos.length === 0) {
     return uploadButton;

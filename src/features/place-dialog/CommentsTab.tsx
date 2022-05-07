@@ -13,6 +13,7 @@ import {
 import { Add } from "@mui/icons-material";
 import {
   useCreateCommentMutation,
+  useGetAccountQuery,
   useGetCommentsQuery,
   useGetUsersQuery,
 } from "../../services/appwrite";
@@ -27,6 +28,7 @@ export function CommentsTab(props: { place: Place | null }) {
       },
       { skip: placeId === "" }
     );
+  const { data: account } = useGetAccountQuery();
   const [isAdding, setIsAdding] = React.useState(false);
   const [comment, setComment] = React.useState("");
   const [createComment, createCommentResult] = useCreateCommentMutation();
@@ -86,29 +88,31 @@ export function CommentsTab(props: { place: Place | null }) {
           </ListItemText>
         </ListItem>
       )}
-      <ListItem divider disablePadding key="add-button">
-        <ListItemText sx={{ pl: 2 }}>
-          {!isAdding ? (
-            <Button
-              startIcon={<Add />}
-              onClick={() => {
-                setIsAdding(true);
-              }}
-            >
-              Add a Comment
-            </Button>
-          ) : (
-            <TextField
-              autoFocus
-              fullWidth
-              size="small"
-              onKeyDown={handleKeyDown}
-              onChange={handleChange}
-              disabled={createCommentResult.isLoading}
-            />
-          )}
-        </ListItemText>
-      </ListItem>
+      {account && (
+        <ListItem divider disablePadding key="add-button">
+          <ListItemText sx={{ pl: 2 }}>
+            {!isAdding ? (
+              <Button
+                startIcon={<Add />}
+                onClick={() => {
+                  setIsAdding(true);
+                }}
+              >
+                Add a Comment
+              </Button>
+            ) : (
+              <TextField
+                autoFocus
+                fullWidth
+                size="small"
+                onKeyDown={handleKeyDown}
+                onChange={handleChange}
+                disabled={createCommentResult.isLoading}
+              />
+            )}
+          </ListItemText>
+        </ListItem>
+      )}
       {(comments || []).map((c) => {
         const name = usersMap.get(c.user_id)?.name || "John Doe";
 

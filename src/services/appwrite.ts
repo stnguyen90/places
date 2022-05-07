@@ -255,7 +255,6 @@ export const appwriteApi = createApi({
       {
         file: File;
         place_id: string;
-        user_id: string;
         text: string;
       }
     >({
