@@ -7,7 +7,7 @@
             "$read": [
                 "role:all"
             ],
-            "$write": [],
+            "$write": ["role:all"],
             "name": "Places",
             "enabled": true,
             "permission": "collection",
