@@ -4,13 +4,15 @@ import {
   Box,
   Button,
   CircularProgress,
+  IconButton,
+  InputAdornment,
   List,
   ListItem,
   ListItemText,
-  TextField,
+  OutlinedInput,
   Typography,
 } from "@mui/material";
-import { Add } from "@mui/icons-material";
+import { Add, Send } from "@mui/icons-material";
 import {
   useCreateCommentMutation,
   useGetAccountQuery,
@@ -64,18 +66,21 @@ export function CommentsTab(props: { place: Place | null }) {
     setComment(event.target.value);
   };
 
-  const handleKeyDown = async (
-    event: React.KeyboardEvent<HTMLInputElement>
-  ) => {
+  const submit = async () => {
+    if (comment === "") return;
+    try {
+      await createComment({
+        place_id: placeId,
+        text: comment,
+      }).unwrap();
+      setComment("");
+      setIsAdding(false);
+    } catch (e) {}
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
-      try {
-        await createComment({
-          place_id: placeId,
-          text: comment,
-        }).unwrap();
-        setComment("");
-        setIsAdding(false);
-      } catch (e) {}
+      submit();
     }
   };
 
@@ -101,13 +106,24 @@ export function CommentsTab(props: { place: Place | null }) {
                 Add a Comment
               </Button>
             ) : (
-              <TextField
+              <OutlinedInput
                 autoFocus
                 fullWidth
                 size="small"
                 onKeyDown={handleKeyDown}
                 onChange={handleChange}
                 disabled={createCommentResult.isLoading}
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton aria-label="submit" edge="end" onClick={submit}>
+                      {createCommentResult.isLoading ? (
+                        <CircularProgress size={20} />
+                      ) : (
+                        <Send />
+                      )}
+                    </IconButton>
+                  </InputAdornment>
+                }
               />
             )}
           </ListItemText>
