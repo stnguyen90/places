@@ -13,10 +13,7 @@ import { PlacesAppBar } from "./features/places-app-bar/PlacesAppBar";
 export const themeOptions: ThemeOptions = {
   palette: {
     primary: {
-      main: "#1a5c1a",
-    },
-    secondary: {
-      main: "#f50057",
+      main: "#f02e65",
     },
   },
 };
@@ -26,12 +23,16 @@ const theme = createTheme(themeOptions);
 function App() {
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ display: "flex", height: "100vh" }}>
-        <CssBaseline />
+      <CssBaseline />
+      <Box sx={{ height: "100%", width: "100%" }}>
         <PlacesAppBar />
         <Box
-          component="main"
-          sx={{ display: "flex", flexGrow: 1, flexFlow: "column" }}
+          sx={{
+            width: "100%",
+            height: "calc(100% - 56px)",
+            position: "absolute",
+            top: 56,
+          }}
         >
           <PlacesMap />
         </Box>
