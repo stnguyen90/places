@@ -80,11 +80,11 @@ export default function AuthForm(props: { onComplete: Function }) {
           name: values.name,
           email: values.email,
           password: values.password1,
-        });
+        }).unwrap();
         await createSession({
           email: values.email,
           password: values.password1,
-        });
+        }).unwrap();
         props.onComplete();
       } catch (e) {
         let message = (e as any).message || String(e);
@@ -95,7 +95,7 @@ export default function AuthForm(props: { onComplete: Function }) {
         await createSession({
           email: values.email,
           password: values.password1,
-        });
+        }).unwrap();
         props.onComplete();
       } catch (e) {
         let message = (e as any).message || String(e);
