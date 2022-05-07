@@ -110,14 +110,18 @@ export default function AuthForm(props: { onComplete: Function }) {
     }
   };
 
+  const inputStyle = {
+    my: 1,
+  };
+
   return (
     <>
-      <Typography variant="h5" sx={{ my: 2, mx: 1 }}>
+      <Typography variant="h5" sx={{ my: 2 }}>
         {isSignUp ? "Sign Up" : "Log In"}
       </Typography>
       {isSignUp && (
         <Box>
-          <FormControl sx={{ m: 1, width: "50ch" }} variant="outlined">
+          <FormControl sx={inputStyle} variant="outlined" fullWidth>
             <InputLabel htmlFor="name">Name</InputLabel>
             <OutlinedInput
               id="name"
@@ -133,7 +137,7 @@ export default function AuthForm(props: { onComplete: Function }) {
         </Box>
       )}
       <Box>
-        <FormControl sx={{ m: 1, width: "50ch" }} variant="outlined">
+        <FormControl sx={inputStyle} variant="outlined" fullWidth>
           <InputLabel htmlFor="email">Email</InputLabel>
           <OutlinedInput
             id="email"
@@ -148,7 +152,7 @@ export default function AuthForm(props: { onComplete: Function }) {
         </FormControl>
       </Box>
       <Box>
-        <FormControl sx={{ m: 1, width: "50ch" }} variant="outlined">
+        <FormControl sx={inputStyle} variant="outlined" fullWidth>
           <InputLabel htmlFor="password1">Password</InputLabel>
           <OutlinedInput
             id="password1"
@@ -174,7 +178,7 @@ export default function AuthForm(props: { onComplete: Function }) {
       </Box>
       {isSignUp && (
         <Box>
-          <FormControl sx={{ m: 1, width: "50ch" }} variant="outlined">
+          <FormControl sx={inputStyle} variant="outlined" fullWidth>
             <InputLabel htmlFor="password2">Password Confirmation</InputLabel>
             <OutlinedInput
               id="password2"

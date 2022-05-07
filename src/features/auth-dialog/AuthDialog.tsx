@@ -28,7 +28,7 @@ export function AuthDialog(props: {
       <Dialog
         open={open}
         onClose={handleClose}
-        maxWidth={false}
+        fullWidth
         scroll="body"
         aria-labelledby="scroll-dialog-title"
         aria-describedby="scroll-dialog-description"
