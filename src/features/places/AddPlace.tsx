@@ -59,8 +59,6 @@ export function AddPlace() {
         newLong = newLong + 360;
       }
 
-      console.log(`creating (${position.posLat}, ${newLong})`);
-
       await createPlace({ lat: position.posLat, long: newLong });
       dispatch(setIsAdding({ isAdding: false }));
     } catch (e) {

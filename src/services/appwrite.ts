@@ -4,7 +4,7 @@ import { Comment, Photo, Place, User } from "./types";
 
 export const sdk = new Appwrite();
 
-const Collections = {
+export const Collections = {
   Places: "places",
   Users: "users",
   Comments: "comments",

@@ -10,15 +10,18 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
+import { RealtimeResponseEvent } from "appwrite";
+import React from "react";
 import {
   Buckets,
+  Collections,
   sdk,
   useGetAccountQuery,
   useGetPhotosQuery,
   useGetUsersQuery,
   useUploadPhotoMutation,
 } from "../../services/appwrite";
-import { Place, User } from "../../services/types";
+import { Photo, Place, User } from "../../services/types";
 
 export function PhotosTab(props: { place: Place | null }) {
   const theme = useTheme();
@@ -26,7 +29,11 @@ export function PhotosTab(props: { place: Place | null }) {
   const matchesLarge = useMediaQuery(theme.breakpoints.up("lg"));
   const placeId = props.place?.$id || "";
   const { data: account } = useGetAccountQuery();
-  const { data: photos, isLoading: getPhotosIsLoading } = useGetPhotosQuery(
+  const {
+    data: photos,
+    isLoading: getPhotosIsLoading,
+    refetch: refetchPhotos,
+  } = useGetPhotosQuery(
     {
       place_id: placeId,
     },
@@ -43,6 +50,26 @@ export function PhotosTab(props: { place: Place | null }) {
     { user_ids: Array.from(userIds) },
     { skip: userIds.size === 0 }
   );
+
+  React.useEffect(() => {
+    const unsubscribe = sdk.subscribe<Photo>(
+      [`collections.${Collections.Photos}.documents`],
+      (response) => {
+        // Callback will be executed on changes for documents A and all files.
+        const updatedPhoto = response.payload;
+        if (
+          response.event === "database.documents.update" &&
+          updatedPhoto.place_id === placeId &&
+          updatedPhoto.file_id !== ""
+        ) {
+          refetchPhotos();
+        }
+      }
+    );
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   if (getPhotosIsLoading || getUsersIsLoading)
     return (
