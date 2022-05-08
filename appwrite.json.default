@@ -375,9 +375,9 @@
     "functions": [
         {
             "$id": "create-user",
-            "name": "Create User",
+            "name": "create-user",
             "runtime": "node-16.0",
-            "path": "functions/Create User",
+            "path": "appwrite-functions/create-user",
             "entrypoint": "src/index.js",
             "vars": {
                 "APPWRITE_FUNCTION_ENDPOINT": "",
@@ -392,9 +392,9 @@
         },
         {
             "$id": "create-comment",
-            "name": "Create Comment",
+            "name": "create-comment",
             "runtime": "node-16.0",
-            "path": "functions/Create Comment",
+            "path": "appwrite-functions/create-comment",
             "entrypoint": "src/index.js",
             "vars": {
                 "APPWRITE_FUNCTION_ENDPOINT": "",
@@ -409,9 +409,9 @@
         },
         {
             "$id": "create-photo",
-            "name": "Create Photo",
+            "name": "create-photo",
             "runtime": "node-16.0",
-            "path": "functions/Create Photo",
+            "path": "appwrite-functions/create-photo",
             "entrypoint": "src/index.js",
             "vars": {
                 "APPWRITE_FUNCTION_ENDPOINT": "",
@@ -426,9 +426,9 @@
         },
         {
             "$id": "process-photo",
-            "name": "Process Photo",
+            "name": "process-photo",
             "runtime": "node-16.0",
-            "path": "functions/Process Photo",
+            "path": "appwrite-functions/process-photo",
             "entrypoint": "src/index.js",
             "vars": {
                 "APPWRITE_FUNCTION_ENDPOINT": "",

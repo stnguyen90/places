@@ -21,7 +21,7 @@ The following steps use the [Appwrite CLI](https://appwrite.io/docs/command-line
    1. Update variables in the `appwrite.json`:
       1. `APPWRITE_FUNCTION_ENDPOINT` - your HTTPS Appwrite endpoint
       1. `APPWRITE_FUNCTION_API_KEY` - the `secret` from the previous step
-   1. Compile each of the functions in the `functions` folder:
+   1. Compile each of the functions in the `appwrite-functions` folder:
       1. Go into the function folder
       1. Run `npm i && npm run build`
    1. Go back up to the folder with `appwrite.json` and deploy all the functions:
