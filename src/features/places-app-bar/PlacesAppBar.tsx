@@ -39,11 +39,6 @@ export function PlacesAppBar() {
     setOpen(true);
   };
 
-  const handleAddPlace = () => {
-    dispatch(setIsAdding({ isAdding: true }));
-    handleMenuClose();
-  };
-
   const handleLogOut = async () => {
     deleteSession();
     handleMenuClose();
@@ -66,7 +61,6 @@ export function PlacesAppBar() {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleAddPlace}>Add a Place</MenuItem>
       <MenuItem onClick={handleLogOut}>Log Out</MenuItem>
     </Menu>
   );

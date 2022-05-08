@@ -1,7 +1,7 @@
 import React from "react";
 import { Fab } from "@mui/material";
 import { Marker, useMap } from "react-leaflet";
-import { AddLocation, Cancel } from "@mui/icons-material";
+import { Save, Cancel } from "@mui/icons-material";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { useCreatePlaceMutation } from "../../services/appwrite";
 import { selectPosition, setPosition, setIsAdding } from "./placesSlice";
@@ -88,7 +88,7 @@ export function AddPlace() {
         aria-label="add"
         onClick={handleAddClick}
       >
-        <AddLocation />
+        <Save />
       </Fab>
     </>
   );

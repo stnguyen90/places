@@ -1,5 +1,5 @@
 import React from "react";
-import { MyLocation } from "@mui/icons-material";
+import { AddLocation, MyLocation } from "@mui/icons-material";
 import { Alert, CircularProgress, Fab } from "@mui/material";
 import { LatLngBounds } from "leaflet";
 import { Marker, useMap } from "react-leaflet";
@@ -11,6 +11,7 @@ import {
   selectBounds,
   selectPosition,
   setBounds,
+  setIsAdding,
   setPosition,
 } from "./placesSlice";
 
@@ -110,10 +111,14 @@ export function Places() {
   const fabStyle = {
     position: "absolute",
     bottom: 40,
-    right: 32,
   };
 
-  const handleClick = () => {
+  const getLocationFabStyle = {
+    ...fabStyle,
+    left: 32,
+  };
+
+  const handleGetLocationClick = () => {
     map.locate().on("locationfound", (e) => {
       dispatch(setBounds(getBounds(e.bounds)));
       dispatch(
@@ -124,6 +129,15 @@ export function Places() {
       );
       map.panTo(e.latlng);
     });
+  };
+
+  const addFabStyle = {
+    ...fabStyle,
+    right: 32,
+  };
+
+  const handleAddPlaceClick = async () => {
+    dispatch(setIsAdding({ isAdding: true }));
   };
 
   return (
@@ -147,14 +161,24 @@ export function Places() {
         setOpen={setOpen}
         place={selectedPlace}
       ></PlaceDialog>
+
       <Fab
         size="large"
-        sx={fabStyle}
+        sx={getLocationFabStyle}
         color="primary"
-        aria-label="add"
-        onClick={handleClick}
+        aria-label="get location"
+        onClick={handleGetLocationClick}
       >
         <MyLocation />
+      </Fab>
+      <Fab
+        size="large"
+        sx={addFabStyle}
+        color="primary"
+        aria-label="add place"
+        onClick={handleAddPlaceClick}
+      >
+        <AddLocation />
       </Fab>
     </>
   );
