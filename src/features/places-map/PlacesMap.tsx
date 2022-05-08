@@ -12,7 +12,7 @@ export function PlacesMap() {
     <MapContainer
       center={[posLat, posLong]}
       zoom={13}
-      scrollWheelZoom={false}
+      scrollWheelZoom="center"
       style={{
         width: "100%",
         height: "100%",
