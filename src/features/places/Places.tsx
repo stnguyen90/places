@@ -39,8 +39,33 @@ export function Places() {
     skip: noBounds,
   });
 
+  // handle selecting a location
   React.useEffect(() => {
     map.panTo([position.posLat, position.posLong]);
+
+    // handle looping around the world going west
+    if (position.posLong < -180) {
+      const newlong = position.posLong + 360;
+      map.setView([position.posLat, newlong]);
+      dispatch(
+        setPosition({
+          ...position,
+          posLong: newlong,
+        })
+      );
+    }
+
+    // handle looping around the world going east
+    if (position.posLong > 180) {
+      const newlong = position.posLong - 360;
+      map.setView([position.posLat, newlong]);
+      dispatch(
+        setPosition({
+          ...position,
+          posLong: newlong,
+        })
+      );
+    }
   }, [position.posLat, position.posLong]);
 
   React.useEffect(() => {

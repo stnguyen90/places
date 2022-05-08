@@ -50,7 +50,18 @@ export function AddPlace() {
 
   const handleAddClick = async () => {
     try {
-      await createPlace({ lat: position.posLat, long: position.posLong });
+      // wrap around the longitude if too far east or west
+      let newLong = position.posLong;
+      while (newLong > 180) {
+        newLong = newLong - 360;
+      }
+      while (newLong < -180) {
+        newLong = newLong + 360;
+      }
+
+      console.log(`creating (${position.posLat}, ${newLong})`);
+
+      await createPlace({ lat: position.posLat, long: newLong });
       dispatch(setIsAdding({ isAdding: false }));
     } catch (e) {
       console.log(e);
