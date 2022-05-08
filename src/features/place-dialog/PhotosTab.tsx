@@ -123,7 +123,10 @@ export function PhotosTab(props: { place: Place | null }) {
   return (
     <>
       {uploadPhotoResult.isError && (
-        <Alert severity="error">{`${uploadPhotoResult.error}`}</Alert>
+        <Alert
+          sx={{ mt: 1 }}
+          severity="error"
+        >{`${uploadPhotoResult.error}`}</Alert>
       )}
 
       <Masonry cols={cols} gap={4}>
