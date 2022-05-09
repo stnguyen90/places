@@ -4,7 +4,7 @@ import { Alert, CircularProgress, Fab } from "@mui/material";
 import { LatLngBounds } from "leaflet";
 import { Marker, useMap } from "react-leaflet";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { useGetPlacesQuery } from "../../services/appwrite";
+import { useGetAccountQuery, useGetPlacesQuery } from "../../services/appwrite";
 import { Place } from "../../services/types";
 import { PlaceDialog } from "../place-dialog/PlaceDialog";
 import {
@@ -39,6 +39,7 @@ export function Places() {
   const { data, isLoading, error } = useGetPlacesQuery(bounds, {
     skip: noBounds,
   });
+  const { data: account } = useGetAccountQuery();
 
   // handle selecting a location
   React.useEffect(() => {
@@ -171,15 +172,17 @@ export function Places() {
       >
         <MyLocation />
       </Fab>
-      <Fab
-        size="large"
-        sx={addFabStyle}
-        color="primary"
-        aria-label="add place"
-        onClick={handleAddPlaceClick}
-      >
-        <AddLocation />
-      </Fab>
+      {account && (
+        <Fab
+          size="large"
+          sx={addFabStyle}
+          color="primary"
+          aria-label="add place"
+          onClick={handleAddPlaceClick}
+        >
+          <AddLocation />
+        </Fab>
+      )}
     </>
   );
 }
