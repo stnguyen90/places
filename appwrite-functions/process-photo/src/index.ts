@@ -2,6 +2,7 @@ import * as sdk from "node-appwrite";
 import * as os from "os";
 import * as fs from "fs";
 import * as path from "path";
+import * as sharp from "sharp";
 
 /*
   'req' variable has:
@@ -98,11 +99,16 @@ module.exports = async function (req: AppwriteRequest, res: AppwriteResponse) {
     return;
   }
 
-  const b = await storage.getFileDownload(file.bucketId, file.$id);
+  let b = await storage.getFileDownload(file.bucketId, file.$id);
 
-  // TODO: resize
+  const s = sharp(b);
 
-  // TODO: remove location metadata
+  s.resize({
+    width: 1080,
+    withoutEnlargement: true,
+  });
+
+  b = await s.toBuffer();
 
   // upload new file
   let tempDir;
