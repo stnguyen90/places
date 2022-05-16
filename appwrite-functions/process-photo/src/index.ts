@@ -137,5 +137,7 @@ module.exports = async function (req: AppwriteRequest, res: AppwriteResponse) {
     file_id: fileId,
   });
 
+  storage.deleteFile(file.bucketId, file.$id);
+
   res.send(`Updated photo ${photoDoc.$id} file_id to ${fileId}`);
 };
