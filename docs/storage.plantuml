@@ -1,0 +1,21 @@
+@startuml "Storage"
+
+interface "storage" as storage1
+
+interface "storage" as storage2
+
+folder "Photo Uploads" {
+    [Photo Uploads Bucket]
+}
+
+folder "Photos" {
+    [Photos Bucket]
+}
+
+storage1 -right-> [Photo Uploads Bucket]: createFile()
+
+[Photo Uploads Bucket] -right-> [Photos Bucket]
+
+storage2 -left-> [Photos Bucket]: getFileView()
+
+@enduml

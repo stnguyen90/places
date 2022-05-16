@@ -1,0 +1,53 @@
+@startuml Collections
+
+class Places {
+    $id : string
+    latitude : float
+    longitude : float
+}
+
+' class Submissions {
+'     $id : string
+'     user_id : string
+'     latitude : float
+'     longitude : float
+'     created : string
+' }
+
+class Comments {
+    $id : string
+    created : string
+    place_id : string
+    user_id : string
+    text : string
+}
+
+' class Votes {
+'     $id : string
+'     place_id : string
+'     user_id : string
+'     created : string
+'     value : int
+' }
+
+class Photos {
+    $id : string
+    created : string
+    file_id : string
+    place_id : string
+    user_id : string
+    text : string
+
+}
+
+class Users {
+    $id : string
+    name : string
+}
+
+Places --  Comments : has many
+Places -- Photos : has many
+Comments -- Users : has 1
+Photos -- Users : has 1
+
+@enduml

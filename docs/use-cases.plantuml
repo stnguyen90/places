@@ -1,0 +1,19 @@
+@startuml "Use Cases"
+
+actor Unauthenticated
+
+Unauthenticated --> (View photos on a place)
+Unauthenticated --> (View comments on a place)
+Unauthenticated --> (View places on the map)
+
+actor Authenticated
+
+Authenticated -up-> (View photos on a place)
+Authenticated -up-> (View comments on a place)
+Authenticated -up-> (View places on the map)
+
+Authenticated --> (Add a place)
+Authenticated --> (Add a comment on a place)
+Authenticated --> (Add a photo on a place)
+
+@enduml
