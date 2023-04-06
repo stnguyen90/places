@@ -1,6 +1,6 @@
 {
   "name": "places-app",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.9.0",
@@ -17,7 +17,7 @@
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
     "@types/react-redux": "^7.1.24",
-    "appwrite": "^7.0.0",
+    "appwrite": "^10.1.0",
     "leaflet": "^1.8.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",

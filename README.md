@@ -27,8 +27,8 @@ The following steps use the [Appwrite CLI](https://appwrite.io/docs/command-line
    1. Go back up to the folder with `appwrite.json` and deploy all the functions:
       1. `echo a | appwrite deploy function`
 1. Create the storage buckets
-   1. `appwrite storage createBucket --bucketId photo-uploads --name "Photo Uploads" --permission file --enabled true --maximumFileSize 5000000 --encryption true --antivirus true --allowedFileExtensions jpg png heic jpeg`
-   1. `appwrite storage createBucket --bucketId photos --name "Photos" --permission bucket --read "role:all" --enabled true --maximumFileSize 5000000 --encryption true --antivirus true --allowedFileExtensions jpg png heic jpeg`
+   1. `appwrite storage createBucket --bucketId photo-uploads --name "Photo Uploads" --fileSecurity true --permissions 'create("users")' --enabled true --maximumFileSize 5000000 --encryption true --antivirus true --allowedFileExtensions jpg png heic jpeg`
+   1. `appwrite storage createBucket --bucketId photos --name "Photos" --fileSecurity false --permissions 'read("any")' --enabled true --maximumFileSize 5000000 --encryption true --antivirus true --allowedFileExtensions jpg png heic jpeg`
 
 ### Places App
 
