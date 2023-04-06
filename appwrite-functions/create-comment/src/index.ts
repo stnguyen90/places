@@ -4,7 +4,7 @@ import * as sdk from "node-appwrite";
   'req' variable has:
     'headers' - object with request headers
     'payload' - object with request body data
-    'env' - object with environment variables
+    'variables' - object with environment variables
 
   'res' variable has:
     'send(text, status)' - function to return text response. Status code defaults to 200
@@ -16,7 +16,7 @@ import * as sdk from "node-appwrite";
 interface AppwriteRequest {
   headers: { [name: string]: string };
   payload: string;
-  env: { [name: string]: string };
+  variables: { [name: string]: string };
 }
 
 interface AppwriteResponse {
@@ -24,14 +24,18 @@ interface AppwriteResponse {
   json: (object, number?) => {};
 }
 
+const databaseId = "default";
+const placesCollectionId = "places";
+const commentsCollectionId = "comments";
+
 module.exports = async function (req: AppwriteRequest, res: AppwriteResponse) {
   const client = new sdk.Client();
 
-  let database = new sdk.Database(client);
+  const databases = new sdk.Databases(client);
 
   if (
-    !req.env["APPWRITE_FUNCTION_ENDPOINT"] ||
-    !req.env["APPWRITE_FUNCTION_API_KEY"]
+    !req.variables["APPWRITE_FUNCTION_ENDPOINT"] ||
+    !req.variables["APPWRITE_FUNCTION_API_KEY"]
   ) {
     throw Error(
       "Environment variables are not set. Function cannot use Appwrite SDK."
@@ -39,9 +43,9 @@ module.exports = async function (req: AppwriteRequest, res: AppwriteResponse) {
   }
 
   client
-    .setEndpoint(req.env["APPWRITE_FUNCTION_ENDPOINT"])
-    .setProject(req.env["APPWRITE_FUNCTION_PROJECT_ID"])
-    .setKey(req.env["APPWRITE_FUNCTION_API_KEY"]);
+    .setEndpoint(req.variables["APPWRITE_FUNCTION_ENDPOINT"])
+    .setProject(req.variables["APPWRITE_FUNCTION_PROJECT_ID"])
+    .setKey(req.variables["APPWRITE_FUNCTION_API_KEY"]);
 
   const data = JSON.parse(req.payload);
 
@@ -50,7 +54,7 @@ module.exports = async function (req: AppwriteRequest, res: AppwriteResponse) {
 
   // validate placeId
   try {
-    await database.getDocument("places", placeId);
+    await databases.getDocument(databaseId, placesCollectionId, placeId);
   } catch {
     res.json(
       {
@@ -61,12 +65,17 @@ module.exports = async function (req: AppwriteRequest, res: AppwriteResponse) {
     return;
   }
 
-  const doc = await database.createDocument("comments", "unique()", {
-    created: new Date().toISOString(),
-    place_id: placeId,
-    user_id: req.env["APPWRITE_FUNCTION_USER_ID"],
-    text: text,
-  });
+  const doc = await databases.createDocument(
+    databaseId,
+    commentsCollectionId,
+    sdk.ID.unique(),
+    {
+      created: new Date().toISOString(),
+      place_id: placeId,
+      user_id: req.variables["APPWRITE_FUNCTION_USER_ID"],
+      text: text,
+    }
+  );
 
   res.send(`Created comment ${doc.$id}`);
 };
