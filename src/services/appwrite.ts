@@ -1,8 +1,14 @@
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
-import { Appwrite, Models, Query } from "appwrite";
+import { Account, Client, Databases, Functions as FunctionsService, ID, Models, Query, Storage } from "appwrite";
 import { Comment, Photo, Place, User } from "./types";
 
-export const sdk = new Appwrite();
+export const client = new Client();
+const account = new Account(client);
+const databases = new Databases(client);
+const functions = new FunctionsService(client);
+const storage = new Storage(client);
+
+export const databaseId = "default";
 
 export const Collections = {
   Places: "places",
@@ -34,8 +40,6 @@ const Attributes = {
   },
 } as const;
 
-const UNIQUE_ID = "unique()";
-
 export const Buckets = {
   Photos: "photos",
   PhotoUploads: "photo-uploads",
@@ -46,7 +50,7 @@ const Functions = {
   CreatePhoto: "create-photo",
 } as const;
 
-sdk
+client
   .setEndpoint(process.env["REACT_APP_APPWRITE_ENDPOINT"] || "")
   .setProject(process.env["REACT_APP_APPWRITE_PROJECT_ID"] || "");
 
@@ -55,18 +59,18 @@ export const appwriteApi = createApi({
   tagTypes: ["Account", "Comments", "Users", "Photos"],
   endpoints: (builder) => ({
     createAccount: builder.mutation<
-      Models.User<Models.Preferences>,
+      Models.Account<Models.Preferences>,
       { name: string; email: string; password: string }
     >({
       queryFn: async (args) => {
         try {
-          const account = await sdk.account.create(
-            UNIQUE_ID,
+          const user = await account.create(
+            ID.unique(),
             args.email,
             args.password,
             args.name
           );
-          return { data: account };
+          return { data: user };
         } catch (e) {
           return {
             error: e,
@@ -81,7 +85,7 @@ export const appwriteApi = createApi({
       invalidatesTags: ["Account"],
       queryFn: async (args) => {
         try {
-          const session = await sdk.account.createSession(
+          const session = await account.createEmailSession(
             args.email,
             args.password
           );
@@ -98,7 +102,7 @@ export const appwriteApi = createApi({
       invalidatesTags: ["Account"],
       queryFn: async () => {
         try {
-          await sdk.account.deleteSession("current");
+          await account.deleteSession("current");
 
           return { data: null };
         } catch (e) {
@@ -108,12 +112,12 @@ export const appwriteApi = createApi({
         }
       },
     }),
-    getAccount: builder.query<Models.User<Models.Preferences> | null, void>({
+    getAccount: builder.query<Models.Account<Models.Preferences> | null, void>({
       providesTags: ["Account"],
       queryFn: async () => {
         try {
-          const account = await sdk.account.get();
-          return { data: account };
+          const user = await account.get();
+          return { data: user };
         } catch (e) {
           return {
             data: null,
@@ -127,9 +131,10 @@ export const appwriteApi = createApi({
     >({
       queryFn: async (args) => {
         try {
-          const doc = await sdk.database.createDocument(
+          const doc = await databases.createDocument(
+            databaseId,
             Collections.Places,
-            UNIQUE_ID,
+            ID.unique(),
             {
               [Attributes.Places.Latitude]: args.lat,
               [Attributes.Places.Longitude]: args.long,
@@ -154,13 +159,14 @@ export const appwriteApi = createApi({
     >({
       queryFn: async (arg) => {
         try {
-          const documentList = await sdk.database.listDocuments<Place>(
+          const documentList = await databases.listDocuments<Place>(
+            databaseId,
             Collections.Places,
             [
-              Query.greater(Attributes.Places.Latitude, arg.minLat),
-              Query.lesser(Attributes.Places.Latitude, arg.maxLat),
-              Query.greater(Attributes.Places.Longitude, arg.minLong),
-              Query.lesser(Attributes.Places.Longitude, arg.maxLong),
+              Query.greaterThan(Attributes.Places.Latitude, arg.minLat),
+              Query.lessThan(Attributes.Places.Latitude, arg.maxLat),
+              Query.greaterThan(Attributes.Places.Longitude, arg.minLong),
+              Query.lessThan(Attributes.Places.Longitude, arg.maxLong),
             ]
           );
           return { data: documentList.documents };
@@ -179,7 +185,8 @@ export const appwriteApi = createApi({
     >({
       queryFn: async (arg) => {
         try {
-          const documentList = await sdk.database.listDocuments<User>(
+          const documentList = await databases.listDocuments<User>(
+            databaseId,
             Collections.Users,
             [Query.equal("$id", arg.user_ids)]
           );
@@ -203,7 +210,7 @@ export const appwriteApi = createApi({
             [Attributes.Comments.Text]: args.text,
           };
 
-          const execution = await sdk.functions.createExecution(
+          const execution = await functions.createExecution(
             Functions.CreateComment,
             JSON.stringify(data),
             false
@@ -232,15 +239,13 @@ export const appwriteApi = createApi({
       providesTags: ["Comments"],
       queryFn: async (arg) => {
         try {
-          const documentList = await sdk.database.listDocuments<Comment>(
+          const documentList = await databases.listDocuments<Comment>(
+            databaseId,
             Collections.Comments,
-            [Query.equal(Attributes.Comments.PlaceId, arg.place_id)],
-            undefined, // limit
-            undefined, // offset
-            undefined, // cursor
-            undefined, // cursorDirection
-            [Attributes.Comments.Created], // orderAttributes
-            ["DESC"] // orderTypes
+            [
+              Query.equal(Attributes.Comments.PlaceId, arg.place_id),
+              Query.orderDesc(Attributes.Comments.Created)
+            ],
           );
           return { data: documentList.documents };
         } catch (e) {
@@ -266,7 +271,7 @@ export const appwriteApi = createApi({
             [Attributes.Photos.Text]: args.text,
           };
 
-          const execution = await sdk.functions.createExecution(
+          const execution = await functions.createExecution(
             Functions.CreatePhoto,
             JSON.stringify(data),
             false
@@ -278,9 +283,9 @@ export const appwriteApi = createApi({
             };
           }
 
-          const docId = execution.stdout;
+          const docId = execution.response;
 
-          const file = await sdk.storage.createFile(
+          const file = await storage.createFile(
             Buckets.PhotoUploads,
             docId,
             args.file
@@ -303,18 +308,14 @@ export const appwriteApi = createApi({
       providesTags: ["Photos"],
       queryFn: async (arg) => {
         try {
-          const documentList = await sdk.database.listDocuments<Photo>(
+          const documentList = await databases.listDocuments<Photo>(
+            databaseId,
             Collections.Photos,
             [
               Query.equal(Attributes.Photos.PlaceId, arg.place_id),
               Query.notEqual(Attributes.Photos.FileId, ""),
+              Query.orderDesc(Attributes.Photos.Created)
             ],
-            undefined, // limit
-            undefined, // offset
-            undefined, // cursor
-            undefined, // cursorDirection
-            [Attributes.Photos.Created], // orderAttributes
-            ["DESC"] // orderTypes
           );
           return { data: documentList.documents };
         } catch (e) {

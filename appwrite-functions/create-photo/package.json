@@ -11,9 +11,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "node-appwrite": "^5.0.0"
+    "node-appwrite": "^8.1.0"
   },
   "devDependencies": {
+    "@types/node": "^18.15.11",
     "typescript": "^4.6.4"
   }
 }

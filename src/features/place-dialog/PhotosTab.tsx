@@ -4,18 +4,19 @@ import {
   Box,
   Button,
   CircularProgress,
-  ImageList as Masonry,
   ImageListItem,
   ImageListItemBar,
+  ImageList as Masonry,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { RealtimeResponseEvent } from "appwrite";
+import { Storage } from "appwrite";
 import React from "react";
 import {
   Buckets,
   Collections,
-  sdk,
+  client,
+  databaseId,
   useGetAccountQuery,
   useGetPhotosQuery,
   useGetUsersQuery,
@@ -52,13 +53,13 @@ export function PhotosTab(props: { place: Place | null }) {
   );
 
   React.useEffect(() => {
-    const unsubscribe = sdk.subscribe<Photo>(
-      [`collections.${Collections.Photos}.documents`],
+    const unsubscribe = client.subscribe<Photo>(
+      [`databases.${databaseId}.collections.${Collections.Photos}.documents`],
       (response) => {
         // Callback will be executed on changes for documents A and all files.
         const updatedPhoto = response.payload;
         if (
-          response.event === "database.documents.update" &&
+          response.events[0].includes(".update") &&
           updatedPhoto.place_id === placeId &&
           updatedPhoto.file_id !== ""
         ) {
@@ -166,7 +167,8 @@ export function PhotosTab(props: { place: Place | null }) {
           const day = date.toLocaleDateString();
           const time = date.toLocaleTimeString();
 
-          const url = sdk.storage.getFileView(Buckets.Photos, p.file_id);
+          const storage = new Storage(client);
+          const url = storage.getFileView(Buckets.Photos, p.file_id);
 
           return (
             <ImageListItem key={p.$id}>

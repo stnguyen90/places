@@ -4,7 +4,7 @@ import * as sdk from "node-appwrite";
   'req' variable has:
     'headers' - object with request headers
     'payload' - object with request body data
-    'env' - object with environment variables
+    'variables' - object with environment variables
 
   'res' variable has:
     'send(text, status)' - function to return text response. Status code defaults to 200
@@ -16,7 +16,7 @@ import * as sdk from "node-appwrite";
 interface AppwriteRequest {
   headers: { [name: string]: string };
   payload: string;
-  env: { [name: string]: string };
+  variables: { [name: string]: string };
 }
 
 interface AppwriteResponse {
@@ -24,14 +24,17 @@ interface AppwriteResponse {
   json: (object, number?) => {};
 }
 
+const databaseId = "default";
+const usersCollectionId = "users";
+
 module.exports = async function (req: AppwriteRequest, res: AppwriteResponse) {
   const client = new sdk.Client();
 
-  let database = new sdk.Database(client);
+  let database = new sdk.Databases(client);
 
   if (
-    !req.env["APPWRITE_FUNCTION_ENDPOINT"] ||
-    !req.env["APPWRITE_FUNCTION_API_KEY"]
+    !req.variables["APPWRITE_FUNCTION_ENDPOINT"] ||
+    !req.variables["APPWRITE_FUNCTION_API_KEY"]
   ) {
     throw Error(
       "Environment variables are not set. Function cannot use Appwrite SDK."
@@ -39,18 +42,18 @@ module.exports = async function (req: AppwriteRequest, res: AppwriteResponse) {
   }
 
   client
-    .setEndpoint(req.env["APPWRITE_FUNCTION_ENDPOINT"])
-    .setProject(req.env["APPWRITE_FUNCTION_PROJECT_ID"])
-    .setKey(req.env["APPWRITE_FUNCTION_API_KEY"]);
+    .setEndpoint(req.variables["APPWRITE_FUNCTION_ENDPOINT"])
+    .setProject(req.variables["APPWRITE_FUNCTION_PROJECT_ID"])
+    .setKey(req.variables["APPWRITE_FUNCTION_API_KEY"]);
 
-  const eventData = req.env["APPWRITE_FUNCTION_EVENT_DATA"];
+  const eventData = req.variables["APPWRITE_FUNCTION_EVENT_DATA"];
   console.log(eventData);
 
   const user: sdk.Models.User<sdk.Models.Preferences> = JSON.parse(eventData);
 
   console.log(user);
 
-  await database.createDocument("users", user.$id, { name: user.name });
+  await database.createDocument(databaseId, usersCollectionId, user.$id, { name: user.name });
 
   res.send(`Created user ${user.$id} in collection users`);
 };
