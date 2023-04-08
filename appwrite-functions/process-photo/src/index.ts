@@ -3,6 +3,9 @@ import * as sdk from "node-appwrite";
 import * as os from "os";
 import * as path from "path";
 import * as sharp from "sharp";
+import { Buckets, databaseId } from "./common/constants";
+import { AppwriteRequest, AppwriteResponse } from "./common/types";
+import { initializeClient } from "./common/utils";
 
 /*
   'req' variable has:
@@ -17,47 +20,15 @@ import * as sharp from "sharp";
   If an error is thrown, a response with code 500 will be returned.
 */
 
-interface AppwriteRequest {
-  headers: { [name: string]: string };
-  payload: string;
-  variables: { [name: string]: string };
-}
-
-interface AppwriteResponse {
-  send: (string, number?) => {};
-  json: (object, number?) => {};
-}
-
 interface PhotoDocument extends sdk.Models.Document {
-  user_id: string;
+  user: sdk.Models.Document;
 }
-
-const databaseId = "default";
-
-const Buckets = {
-  Photos: "photos",
-  PhotoUploads: "photo-uploads",
-} as const;
 
 module.exports = async function (req: AppwriteRequest, res: AppwriteResponse) {
-  const client = new sdk.Client();
+  const client = initializeClient(req);
 
   const database = new sdk.Databases(client);
   const storage = new sdk.Storage(client);
-
-  if (
-    !req.variables["APPWRITE_FUNCTION_ENDPOINT"] ||
-    !req.variables["APPWRITE_FUNCTION_API_KEY"]
-  ) {
-    throw Error(
-      "Environment variables are not set. Function cannot use Appwrite SDK."
-    );
-  }
-
-  client
-    .setEndpoint(req.variables["APPWRITE_FUNCTION_ENDPOINT"])
-    .setProject(req.variables["APPWRITE_FUNCTION_PROJECT_ID"])
-    .setKey(req.variables["APPWRITE_FUNCTION_API_KEY"]);
 
   const eventData = req.variables["APPWRITE_FUNCTION_EVENT_DATA"];
   console.log(eventData);
@@ -96,10 +67,10 @@ module.exports = async function (req: AppwriteRequest, res: AppwriteResponse) {
     res.send(`Photo ${file.$id} does not exist`);
     return;
   }
-  if (photoDoc.user_id !== userId) {
+  if (photoDoc.user.$id !== userId) {
     storage.deleteFile(file.bucketId, file.$id);
     res.send(
-      `Photo user_id (${photoDoc.user_id}) does not match file's userId (${userId})`
+      `Photo user_id (${photoDoc.user.$id}) does not match file's userId (${userId})`
     );
     return;
   }

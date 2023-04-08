@@ -402,9 +402,10 @@
             "runtime": "node-16.0",
             "path": "appwrite-functions/create-user",
             "entrypoint": "src/index.js",
-            "vars": {
+            "variables": {
                 "APPWRITE_FUNCTION_ENDPOINT": "",
-                "APPWRITE_FUNCTION_API_KEY": ""
+                "APPWRITE_FUNCTION_API_KEY": "",
+                "APPWRITE_FUNCTION_SELF_SIGNED": ""
             },
             "execute": [],
             "events": [
@@ -419,9 +420,10 @@
             "runtime": "node-16.0",
             "path": "appwrite-functions/create-comment",
             "entrypoint": "src/index.js",
-            "vars": {
+            "variables": {
                 "APPWRITE_FUNCTION_ENDPOINT": "",
-                "APPWRITE_FUNCTION_API_KEY": ""
+                "APPWRITE_FUNCTION_API_KEY": "",
+                "APPWRITE_FUNCTION_SELF_SIGNED": ""
             },
             "execute": [
                 "users"
@@ -436,9 +438,10 @@
             "runtime": "node-16.0",
             "path": "appwrite-functions/create-photo",
             "entrypoint": "src/index.js",
-            "vars": {
+            "variables": {
                 "APPWRITE_FUNCTION_ENDPOINT": "",
-                "APPWRITE_FUNCTION_API_KEY": ""
+                "APPWRITE_FUNCTION_API_KEY": "",
+                "APPWRITE_FUNCTION_SELF_SIGNED": ""
             },
             "execute": [
                 "users"
@@ -453,9 +456,10 @@
             "runtime": "node-16.0",
             "path": "appwrite-functions/process-photo",
             "entrypoint": "src/index.js",
-            "vars": {
+            "variables": {
                 "APPWRITE_FUNCTION_ENDPOINT": "",
-                "APPWRITE_FUNCTION_API_KEY": ""
+                "APPWRITE_FUNCTION_API_KEY": "",
+                "APPWRITE_FUNCTION_SELF_SIGNED": ""
             },
             "execute": [],
             "events": [
