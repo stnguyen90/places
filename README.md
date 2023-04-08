@@ -13,7 +13,7 @@ The following steps use the [Appwrite CLI](https://appwrite.io/docs/command-line
    - Name: Places
 1. Copy the `appwrite.json.default` to `appwrite.json`
 1. Deploy the collections
-   1. `echo a | appwrite deploy collection`
+   1. `appwrite deploy collection --all`
 1. Create an API Key
    1. `appwrite projects createKey --projectId places --name "Places Functions" --scopes documents.read documents.write files.read files.write`
    1. Take note of the `secret`
@@ -21,14 +21,14 @@ The following steps use the [Appwrite CLI](https://appwrite.io/docs/command-line
    1. Update variables in the `appwrite.json`:
       1. `APPWRITE_FUNCTION_ENDPOINT` - your HTTPS Appwrite endpoint
       1. `APPWRITE_FUNCTION_API_KEY` - the `secret` from the previous step
+      1. `APPWRITE_FUNCTION_SELF_SIGNED` - set to `"true"` if you are using a self-signed certificate
    1. Compile each of the functions in the `appwrite-functions` folder:
       1. Go into the function folder
       1. Run `npm i && npm run build`
    1. Go back up to the folder with `appwrite.json` and deploy all the functions:
-      1. `echo a | appwrite deploy function`
-1. Create the storage buckets
-   1. `appwrite storage createBucket --bucketId photo-uploads --name "Photo Uploads" --fileSecurity true --permissions 'create("users")' --enabled true --maximumFileSize 5000000 --encryption true --antivirus true --allowedFileExtensions jpg png heic jpeg`
-   1. `appwrite storage createBucket --bucketId photos --name "Photos" --fileSecurity false --permissions 'read("any")' --enabled true --maximumFileSize 5000000 --encryption true --antivirus true --allowedFileExtensions jpg png heic jpeg`
+      1. `appwrite deploy function --all`
+1. Deploy the storage buckets
+   1. `appwrite deploy bucket --all`
 
 ### Places App
 

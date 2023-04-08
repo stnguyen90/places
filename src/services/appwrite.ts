@@ -1,6 +1,6 @@
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
 import { Account, Client, Databases, Functions as FunctionsService, ID, Models, Query, Storage } from "appwrite";
-import { Comment, Photo, Place, User } from "./types";
+import { Comment, Photo, Place } from "./types";
 
 export const client = new Client();
 const account = new Account(client);
@@ -26,15 +26,13 @@ const Attributes = {
     Name: "name",
   },
   Comments: {
-    Created: "created",
-    PlaceId: "place_id",
-    UserId: "user_id",
+    Place: "place",
+    User: "user",
     Text: "text",
   },
   Photos: {
-    Created: "created",
-    PlaceId: "place_id",
-    UserId: "user_id",
+    Place: "place",
+    User: "user",
     FileId: "file_id",
     Text: "text",
   },
@@ -163,32 +161,12 @@ export const appwriteApi = createApi({
             databaseId,
             Collections.Places,
             [
+              'select(["latitude", "longitude"])',
               Query.greaterThan(Attributes.Places.Latitude, arg.minLat),
               Query.lessThan(Attributes.Places.Latitude, arg.maxLat),
               Query.greaterThan(Attributes.Places.Longitude, arg.minLong),
               Query.lessThan(Attributes.Places.Longitude, arg.maxLong),
             ]
-          );
-          return { data: documentList.documents };
-        } catch (e) {
-          return {
-            error: e,
-          };
-        }
-      },
-    }),
-    getUsers: builder.query<
-      User[],
-      {
-        user_ids: string[];
-      }
-    >({
-      queryFn: async (arg) => {
-        try {
-          const documentList = await databases.listDocuments<User>(
-            databaseId,
-            Collections.Users,
-            [Query.equal("$id", arg.user_ids)]
           );
           return { data: documentList.documents };
         } catch (e) {
@@ -206,7 +184,7 @@ export const appwriteApi = createApi({
       queryFn: async (args) => {
         try {
           const data = {
-            [Attributes.Comments.PlaceId]: args.place_id,
+            'place_id': args.place_id,
             [Attributes.Comments.Text]: args.text,
           };
 
@@ -243,8 +221,8 @@ export const appwriteApi = createApi({
             databaseId,
             Collections.Comments,
             [
-              Query.equal(Attributes.Comments.PlaceId, arg.place_id),
-              Query.orderDesc(Attributes.Comments.Created)
+              Query.equal(Attributes.Comments.Place, arg.place_id),
+              Query.orderDesc('$createdAt'),
             ],
           );
           return { data: documentList.documents };
@@ -267,7 +245,7 @@ export const appwriteApi = createApi({
       queryFn: async (args) => {
         try {
           const data = {
-            [Attributes.Photos.PlaceId]: args.place_id,
+            'place_id': args.place_id,
             [Attributes.Photos.Text]: args.text,
           };
 
@@ -312,9 +290,9 @@ export const appwriteApi = createApi({
             databaseId,
             Collections.Photos,
             [
-              Query.equal(Attributes.Photos.PlaceId, arg.place_id),
+              Query.equal(Attributes.Photos.Place, arg.place_id),
               Query.notEqual(Attributes.Photos.FileId, ""),
-              Query.orderDesc(Attributes.Photos.Created)
+              Query.orderDesc('$createdAt')
             ],
           );
           return { data: documentList.documents };
@@ -337,7 +315,6 @@ export const {
   useGetAccountQuery,
   useCreatePlaceMutation,
   useGetPlacesQuery,
-  useGetUsersQuery,
   useCreateCommentMutation,
   useGetCommentsQuery,
   useUploadPhotoMutation,
