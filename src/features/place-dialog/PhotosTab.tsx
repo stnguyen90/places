@@ -19,10 +19,9 @@ import {
   databaseId,
   useGetAccountQuery,
   useGetPhotosQuery,
-  useGetUsersQuery,
   useUploadPhotoMutation,
 } from "../../services/appwrite";
-import { Photo, Place, User } from "../../services/types";
+import { Photo, Place } from "../../services/types";
 
 export function PhotosTab(props: { place: Place | null }) {
   const theme = useTheme();
@@ -42,16 +41,6 @@ export function PhotosTab(props: { place: Place | null }) {
   );
   const [uploadPhoto, uploadPhotoResult] = useUploadPhotoMutation();
 
-  const userIds = new Set<string>();
-  photos?.forEach((p) => {
-    userIds.add(p.user_id);
-  });
-
-  const { data: users, isLoading: getUsersIsLoading } = useGetUsersQuery(
-    { user_ids: Array.from(userIds) },
-    { skip: userIds.size === 0 }
-  );
-
   React.useEffect(() => {
     const unsubscribe = client.subscribe<Photo>(
       [`databases.${databaseId}.collections.${Collections.Photos}.documents`],
@@ -60,7 +49,7 @@ export function PhotosTab(props: { place: Place | null }) {
         const updatedPhoto = response.payload;
         if (
           response.events[0].includes(".update") &&
-          updatedPhoto.place_id === placeId &&
+          updatedPhoto?.place?.$id === placeId &&
           updatedPhoto.file_id !== ""
         ) {
           refetchPhotos();
@@ -72,7 +61,7 @@ export function PhotosTab(props: { place: Place | null }) {
     };
   }, []);
 
-  if (getPhotosIsLoading || getUsersIsLoading)
+  if (getPhotosIsLoading)
     return (
       <Box
         display="flex"
@@ -83,11 +72,6 @@ export function PhotosTab(props: { place: Place | null }) {
         <CircularProgress />
       </Box>
     );
-
-  const usersMap = new Map<string, User>();
-  users?.forEach((u) => {
-    usersMap.set(u.$id, u);
-  });
 
   let cols = 1;
   if (matchesLarge) {
@@ -161,9 +145,7 @@ export function PhotosTab(props: { place: Place | null }) {
         {uploadButton}
 
         {(photos || []).map((p) => {
-          const name = usersMap.get(p.user_id)?.name || "John Doe";
-
-          const date = new Date(p.created);
+          const date = new Date(p.$createdAt);
           const day = date.toLocaleDateString();
           const time = date.toLocaleTimeString();
 
@@ -175,7 +157,7 @@ export function PhotosTab(props: { place: Place | null }) {
               <img src={`${url}`} alt={p.text} loading="lazy" />
               <ImageListItemBar
                 position="below"
-                title={name}
+                title={p.user?.name || "John Doe"}
                 subtitle={`${day} ${time}`}
               />
             </ImageListItem>
