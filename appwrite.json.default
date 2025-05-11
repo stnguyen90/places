@@ -40,32 +40,6 @@
                     "min": -180,
                     "max": 180,
                     "default": null
-                },
-                {
-                    "key": "comments",
-                    "type": "relationship",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "relatedCollection": "comments",
-                    "relationType": "oneToMany",
-                    "twoWay": true,
-                    "twoWayKey": "place",
-                    "onDelete": "cascade",
-                    "side": "parent"
-                },
-                {
-                    "key": "photos",
-                    "type": "relationship",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "relatedCollection": "photos",
-                    "relationType": "oneToMany",
-                    "twoWay": true,
-                    "twoWayKey": "place",
-                    "onDelete": "cascade",
-                    "side": "parent"
                 }
             ],
             "indexes": [
@@ -110,11 +84,11 @@
                     "required": false,
                     "array": false,
                     "relatedCollection": "places",
-                    "relationType": "oneToMany",
-                    "twoWay": true,
+                    "relationType": "manyToOne",
+                    "twoWay": false,
                     "twoWayKey": "comments",
                     "onDelete": "cascade",
-                    "side": "child"
+                    "side": "parent"
                 },
                 {
                     "key": "user",
@@ -123,11 +97,11 @@
                     "required": false,
                     "array": false,
                     "relatedCollection": "users",
-                    "relationType": "oneToMany",
-                    "twoWay": true,
+                    "relationType": "manyToOne",
+                    "twoWay": false,
                     "twoWayKey": "comments",
                     "onDelete": "cascade",
-                    "side": "child"
+                    "side": "parent"
                 }
             ],
             "indexes": []
@@ -152,7 +126,7 @@
                     "default": null
                 },
                 {
-                    "key": "file_id",
+                    "key": "fileId",
                     "type": "string",
                     "status": "available",
                     "required": true,
@@ -167,11 +141,11 @@
                     "required": false,
                     "array": false,
                     "relatedCollection": "places",
-                    "relationType": "oneToMany",
-                    "twoWay": true,
+                    "relationType": "manyToOne",
+                    "twoWay": false,
                     "twoWayKey": "photos",
                     "onDelete": "cascade",
-                    "side": "child"
+                    "side": "parent"
                 },
                 {
                     "key": "user",
@@ -180,11 +154,11 @@
                     "required": false,
                     "array": false,
                     "relatedCollection": "users",
-                    "relationType": "oneToMany",
-                    "twoWay": true,
+                    "relationType": "manyToOne",
+                    "twoWay": false,
                     "twoWayKey": "photos",
                     "onDelete": "cascade",
-                    "side": "child"
+                    "side": "parent"
                 }
             ],
             "indexes": []
@@ -207,32 +181,6 @@
                     "array": false,
                     "size": 50,
                     "default": null
-                },
-                {
-                    "key": "comments",
-                    "type": "relationship",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "relatedCollection": "comments",
-                    "relationType": "oneToMany",
-                    "twoWay": true,
-                    "twoWayKey": "user",
-                    "onDelete": "cascade",
-                    "side": "parent"
-                },
-                {
-                    "key": "photos",
-                    "type": "relationship",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "relatedCollection": "photos",
-                    "relationType": "oneToMany",
-                    "twoWay": true,
-                    "twoWayKey": "user",
-                    "onDelete": "cascade",
-                    "side": "parent"
                 }
             ],
             "indexes": []
@@ -242,17 +190,18 @@
         {
             "$id": "create-user",
             "name": "create-user",
-            "runtime": "node-16.0",
+            "enabled": true,
+            "logging": true,
+            "runtime": "node-22",
             "path": "appwrite-functions/create-user",
-            "entrypoint": "src/index.js",
-            "variables": {
-                "APPWRITE_FUNCTION_ENDPOINT": "",
-                "APPWRITE_FUNCTION_API_KEY": "",
-                "APPWRITE_FUNCTION_SELF_SIGNED": ""
-            },
+            "entrypoint": "dist/index.js",
+            "commands": "npm install && npm run build",
             "execute": [],
             "events": [
                 "users.*.create"
+            ],
+            "scopes": [
+                "documents.write"
             ],
             "schedule": "",
             "timeout": 15
@@ -260,16 +209,17 @@
         {
             "$id": "create-comment",
             "name": "create-comment",
-            "runtime": "node-16.0",
+            "enabled": true,
+            "logging": true,
+            "runtime": "node-22",
             "path": "appwrite-functions/create-comment",
-            "entrypoint": "src/index.js",
-            "variables": {
-                "APPWRITE_FUNCTION_ENDPOINT": "",
-                "APPWRITE_FUNCTION_API_KEY": "",
-                "APPWRITE_FUNCTION_SELF_SIGNED": ""
-            },
+            "entrypoint": "dist/index.js",
+            "commands": "npm install && npm run build",
             "execute": [
                 "users"
+            ],
+            "scopes": [
+                "documents.write"
             ],
             "events": [],
             "schedule": "",
@@ -278,16 +228,17 @@
         {
             "$id": "create-photo",
             "name": "create-photo",
-            "runtime": "node-16.0",
+            "enabled": true,
+            "logging": true,
+            "runtime": "node-22",
             "path": "appwrite-functions/create-photo",
-            "entrypoint": "src/index.js",
-            "variables": {
-                "APPWRITE_FUNCTION_ENDPOINT": "",
-                "APPWRITE_FUNCTION_API_KEY": "",
-                "APPWRITE_FUNCTION_SELF_SIGNED": ""
-            },
+            "entrypoint": "dist/index.js",
+            "commands": "npm install && npm run build",
             "execute": [
                 "users"
+            ],
+            "scopes": [
+                "documents.write"
             ],
             "events": [],
             "schedule": "",
@@ -296,17 +247,21 @@
         {
             "$id": "process-photo",
             "name": "process-photo",
-            "runtime": "node-16.0",
+            "enabled": true,
+            "logging": true,
+            "runtime": "node-22",
             "path": "appwrite-functions/process-photo",
-            "entrypoint": "src/index.js",
-            "variables": {
-                "APPWRITE_FUNCTION_ENDPOINT": "",
-                "APPWRITE_FUNCTION_API_KEY": "",
-                "APPWRITE_FUNCTION_SELF_SIGNED": ""
-            },
+            "entrypoint": "dist/index.js",
+            "commands": "npm install --os=linux --libc=musl --cpu=x64 sharp && npm install && npm run build",
             "execute": [],
             "events": [
                 "buckets.photo-uploads.files.*.create"
+            ],
+            "scopes": [
+                "documents.read",
+                "documents.write",
+                "files.read",
+                "files.write"
             ],
             "schedule": "",
             "timeout": 15

@@ -1,34 +1,22 @@
-import * as sdk from "node-appwrite";
-import { Collections, databaseId } from "./common/constants";
-import { AppwriteRequest, AppwriteResponse } from "./common/types";
-import { initializeClient } from "./common/utils";
+import { Databases, type Models } from "node-appwrite";
+import { Collections, databaseId } from "./common/constants.js";
+import type { AppwriteContext } from "./common/types.js";
+import { initializeClient } from "./common/utils.js";
 
-/*
-  'req' variable has:
-    'headers' - object with request headers
-    'payload' - object with request body data
-    'variables' - object with environment variables
-
-  'res' variable has:
-    'send(text, status)' - function to return text response. Status code defaults to 200
-    'json(obj, status)' - function to return JSON response. Status code defaults to 200
-
-  If an error is thrown, a response with code 500 will be returned.
-*/
-
-module.exports = async function (req: AppwriteRequest, res: AppwriteResponse) {
+async function main({ req, res, log }: AppwriteContext) {
   const client = initializeClient(req);
 
-  let database = new sdk.Databases(client);
+  const database = new Databases(client);
 
-  const eventData = req.variables["APPWRITE_FUNCTION_EVENT_DATA"];
-  console.log(eventData);
+  const user = req.bodyJson as Models.User<Models.Preferences>;
 
-  const user: sdk.Models.User<sdk.Models.Preferences> = JSON.parse(eventData);
+  log(user);
 
-  console.log(user);
+  await database.createDocument(databaseId, Collections.Users, user.$id, {
+    name: user.name,
+  });
 
-  await database.createDocument(databaseId, Collections.Users, user.$id, { name: user.name });
+  return res.send(`Created user ${user.$id} in collection users`);
+}
 
-  res.send(`Created user ${user.$id} in collection users`);
-};
+export default main;

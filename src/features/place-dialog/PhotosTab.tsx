@@ -35,9 +35,9 @@ export function PhotosTab(props: { place: Place | null }) {
     refetch: refetchPhotos,
   } = useGetPhotosQuery(
     {
-      place_id: placeId,
+      placeId: placeId,
     },
-    { skip: placeId === "" }
+    { skip: placeId === "" },
   );
   const [uploadPhoto, uploadPhotoResult] = useUploadPhotoMutation();
 
@@ -50,11 +50,11 @@ export function PhotosTab(props: { place: Place | null }) {
         if (
           response.events[0].includes(".update") &&
           updatedPhoto?.place?.$id === placeId &&
-          updatedPhoto.file_id !== ""
+          updatedPhoto.fileId !== ""
         ) {
           refetchPhotos();
         }
-      }
+      },
     );
     return () => {
       unsubscribe();
@@ -85,7 +85,7 @@ export function PhotosTab(props: { place: Place | null }) {
     if (files && files.length > 0) {
       uploadPhoto({
         file: files[0],
-        place_id: placeId,
+        placeId: placeId,
         text: "",
       });
     }
@@ -150,7 +150,7 @@ export function PhotosTab(props: { place: Place | null }) {
           const time = date.toLocaleTimeString();
 
           const storage = new Storage(client);
-          const url = storage.getFileView(Buckets.Photos, p.file_id);
+          const url = storage.getFileView(Buckets.Photos, p.fileId);
 
           return (
             <ImageListItem key={p.$id}>

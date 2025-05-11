@@ -1,23 +1,20 @@
-import * as sdk from "node-appwrite";
-import { AppwriteRequest } from "./types";
+import { Client } from "node-appwrite";
+import type { AppwriteRequest } from "./types.js";
 
-export function initializeClient(req: AppwriteRequest): sdk.Client {
-  const client = new sdk.Client();
+export function initializeClient(req: AppwriteRequest): Client {
+  const client = new Client();
 
-  if (
-    !req.variables["APPWRITE_FUNCTION_ENDPOINT"] ||
-    !req.variables["APPWRITE_FUNCTION_API_KEY"]
-  ) {
+  const endpoint = process.env.APPWRITE_FUNCTION_API_ENDPOINT;
+  const projectId = process.env.APPWRITE_FUNCTION_PROJECT_ID;
+  const apiKey = req.headers["x-appwrite-key"] ?? "";
+
+  if (!endpoint || !projectId) {
     throw Error(
-      "Environment variables are not set. Function cannot use Appwrite SDK."
+      "Environment variables are not set. Function cannot use Appwrite SDK.",
     );
   }
 
-  client
-    .setEndpoint(req.variables["APPWRITE_FUNCTION_ENDPOINT"])
-    .setProject(req.variables["APPWRITE_FUNCTION_PROJECT_ID"])
-    .setKey(req.variables["APPWRITE_FUNCTION_API_KEY"])
-    .setSelfSigned(req.variables["APPWRITE_FUNCTION_SELF_SIGNED"] === "true");
+  client.setEndpoint(endpoint).setProject(projectId).setKey(apiKey);
 
   return client;
 }

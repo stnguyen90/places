@@ -25,7 +25,7 @@ export function CommentsTab(props: { place: Place | null }) {
   const { data: comments, isLoading: getCommentsIsLoading } =
     useGetCommentsQuery(
       {
-        place_id: placeId,
+        placeId,
       },
       { skip: placeId === "" }
     );
@@ -54,7 +54,7 @@ export function CommentsTab(props: { place: Place | null }) {
     if (comment === "") return;
     try {
       await createComment({
-        place_id: placeId,
+        placeId: placeId,
         text: comment,
       }).unwrap();
       setComment("");

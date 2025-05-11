@@ -1,42 +1,35 @@
-import * as sdk from "node-appwrite";
-import { Collections, databaseId } from "./common/constants";
-import { AppwriteRequest, AppwriteResponse } from "./common/types";
-import { initializeClient } from "./common/utils";
+import { Databases, ID } from "node-appwrite";
+import { Collections, databaseId } from "./common/constants.js";
+import type { AppwriteContext } from "./common/types.js";
+import { initializeClient } from "./common/utils.js";
 
-/*
-  'req' variable has:
-    'headers' - object with request headers
-    'payload' - object with request body data
-    'variables' - object with environment variables
-
-  'res' variable has:
-    'send(text, status)' - function to return text response. Status code defaults to 200
-    'json(obj, status)' - function to return JSON response. Status code defaults to 200
-
-  If an error is thrown, a response with code 500 will be returned.
-*/
-
-module.exports = async function (req: AppwriteRequest, res: AppwriteResponse) {
+async function main({ req, res }: AppwriteContext) {
   const client = initializeClient(req);
 
-  const databases = new sdk.Databases(client);
+  const databases = new Databases(client);
 
-  const data = JSON.parse(req.payload);
+  const data = req.bodyJson as {
+    placeId: string;
+    text: string;
+  };
 
-  const placeId = data["place_id"];
-  const text = data["text"];
+  const placeId = data.placeId;
+  const text = data.text;
 
   const doc = await databases.createDocument(
     databaseId,
     Collections.Photos,
-    sdk.ID.unique(),
+    ID.unique(),
     {
       place: placeId,
-      file_id: "",
-      user: req.variables["APPWRITE_FUNCTION_USER_ID"],
-      text: text,
-    }
+      fileId: "",
+      user: req.headers["x-appwrite-user-id"],
+      text,
+    },
   );
 
-  res.send(doc.$id);
-};
+  return res.send(doc.$id);
+}
+
+export default main;
+  
