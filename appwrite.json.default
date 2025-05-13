@@ -1,13 +1,20 @@
 {
     "projectId": "places",
     "projectName": "Places",
+    "databases": [
+        {
+            "$id": "default",
+            "name": "default",
+            "$createdAt": "2023-04-07T22:30:01.152+00:00",
+            "$updatedAt": "2023-04-07T22:32:50.830+00:00"
+        }
+    ],
     "collections": [
         {
             "$id": "places",
-            "$createdAt": "",
-            "$updatedAt": "2022-10-26T04:47:15.972+00:00",
             "$permissions": [
-                "read(\"any\")"
+                "read(\"any\")",
+                "create(\"users\")"
             ],
             "databaseId": "default",
             "name": "Places",
@@ -52,96 +59,7 @@
             ]
         },
         {
-            "$id": "submissions",
-            "$createdAt": "",
-            "$updatedAt": "2022-10-26T04:47:18.650+00:00",
-            "$permissions": [],
-            "databaseId": "default",
-            "name": "Submissions",
-            "enabled": true,
-            "documentSecurity": false,
-            "attributes": [
-                {
-                    "key": "longitude",
-                    "type": "double",
-                    "status": "available",
-                    "required": true,
-                    "array": false,
-                    "min": -180,
-                    "max": 180,
-                    "default": null
-                },
-                {
-                    "key": "user_id",
-                    "type": "string",
-                    "status": "available",
-                    "required": true,
-                    "array": false,
-                    "size": 50,
-                    "default": null
-                },
-                {
-                    "key": "latitude",
-                    "type": "double",
-                    "status": "available",
-                    "required": true,
-                    "array": false,
-                    "min": -90,
-                    "max": 90,
-                    "default": null
-                },
-                {
-                    "key": "created",
-                    "type": "string",
-                    "status": "available",
-                    "required": true,
-                    "array": false,
-                    "size": 50,
-                    "default": null
-                }
-            ],
-            "indexes": [
-                {
-                    "key": "unique_latitude_asc_longitude_asc",
-                    "type": "unique",
-                    "status": "available",
-                    "attributes": [
-                        "latitude",
-                        "longitude"
-                    ],
-                    "orders": [
-                        "ASC",
-                        "ASC"
-                    ]
-                },
-                {
-                    "key": "key_user_id_asc",
-                    "type": "key",
-                    "status": "available",
-                    "attributes": [
-                        "user_id"
-                    ],
-                    "orders": [
-                        "ASC"
-                    ]
-                },
-                {
-                    "key": "key_created_asc",
-                    "type": "key",
-                    "status": "available",
-                    "attributes": [
-                        "created"
-                    ],
-                    "orders": [
-                        "ASC"
-                    ]
-                }
-            ]
-        },
-        {
             "$id": "comments",
-            "$createdAt": "",
-            "$updatedAt": "2022-10-26T04:47:20.908+00:00",
             "$permissions": [
                 "read(\"any\")"
             ],
@@ -151,33 +69,6 @@
             "documentSecurity": false,
             "attributes": [
                 {
-                    "key": "place_id",
-                    "type": "string",
-                    "status": "available",
-                    "required": true,
-                    "array": false,
-                    "size": 50,
-                    "default": null
-                },
-                {
-                    "key": "created",
-                    "type": "string",
-                    "status": "available",
-                    "required": true,
-                    "array": false,
-                    "size": 50,
-                    "default": null
-                },
-                {
-                    "key": "user_id",
-                    "type": "string",
-                    "status": "available",
-                    "required": true,
-                    "array": false,
-                    "size": 50,
-                    "default": null
-                },
-                {
                     "key": "text",
                     "type": "string",
                     "status": "available",
@@ -185,110 +76,38 @@
                     "array": false,
                     "size": 255,
                     "default": null
+                },
+                {
+                    "key": "place",
+                    "type": "relationship",
+                    "status": "available",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "places",
+                    "relationType": "manyToOne",
+                    "twoWay": false,
+                    "twoWayKey": "comments",
+                    "onDelete": "cascade",
+                    "side": "parent"
+                },
+                {
+                    "key": "user",
+                    "type": "relationship",
+                    "status": "available",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "users",
+                    "relationType": "manyToOne",
+                    "twoWay": false,
+                    "twoWayKey": "comments",
+                    "onDelete": "cascade",
+                    "side": "parent"
                 }
             ],
-            "indexes": [
-                {
-                    "key": "key_created_asc",
-                    "type": "key",
-                    "status": "available",
-                    "attributes": [
-                        "created"
-                    ],
-                    "orders": [
-                        "ASC"
-                    ]
-                },
-                {
-                    "key": "key_user_id_asc",
-                    "type": "key",
-                    "status": "available",
-                    "attributes": [
-                        "user_id"
-                    ],
-                    "orders": [
-                        "ASC"
-                    ]
-                },
-                {
-                    "key": "key_place_id_asc",
-                    "type": "key",
-                    "status": "available",
-                    "attributes": [
-                        "place_id"
-                    ],
-                    "orders": [
-                        "ASC"
-                    ]
-                }
-            ]
-        },
-        {
-            "$id": "votes",
-            "$createdAt": "",
-            "$updatedAt": "2022-10-26T04:47:23.356+00:00",
-            "$permissions": [],
-            "databaseId": "default",
-            "name": "Votes",
-            "enabled": true,
-            "documentSecurity": false,
-            "attributes": [
-                {
-                    "key": "value",
-                    "type": "integer",
-                    "status": "available",
-                    "required": true,
-                    "array": false,
-                    "min": -1,
-                    "max": 1,
-                    "default": null
-                },
-                {
-                    "key": "created",
-                    "type": "string",
-                    "status": "available",
-                    "required": true,
-                    "array": false,
-                    "size": 50,
-                    "default": null
-                },
-                {
-                    "key": "place_id",
-                    "type": "string",
-                    "status": "available",
-                    "required": true,
-                    "array": false,
-                    "size": 50,
-                    "default": null
-                },
-                {
-                    "key": "user_id",
-                    "type": "string",
-                    "status": "available",
-                    "required": true,
-                    "array": false,
-                    "size": 50,
-                    "default": null
-                }
-            ],
-            "indexes": [
-                {
-                    "key": "key_place_id_asc",
-                    "type": "key",
-                    "status": "available",
-                    "attributes": [
-                        "place_id"
-                    ],
-                    "orders": [
-                        "ASC"
-                    ]
-                }
-            ]
+            "indexes": []
         },
         {
             "$id": "photos",
-            "$createdAt": "",
-            "$updatedAt": "2022-10-26T04:47:25.726+00:00",
             "$permissions": [
                 "read(\"any\")"
             ],
@@ -298,15 +117,6 @@
             "documentSecurity": false,
             "attributes": [
                 {
-                    "key": "created",
-                    "type": "string",
-                    "status": "available",
-                    "required": true,
-                    "array": false,
-                    "size": 50,
-                    "default": null
-                },
-                {
                     "key": "text",
                     "type": "string",
                     "status": "available",
@@ -316,7 +126,7 @@
                     "default": null
                 },
                 {
-                    "key": "place_id",
+                    "key": "fileId",
                     "type": "string",
                     "status": "available",
                     "required": true,
@@ -325,55 +135,36 @@
                     "default": null
                 },
                 {
-                    "key": "user_id",
-                    "type": "string",
+                    "key": "place",
+                    "type": "relationship",
                     "status": "available",
-                    "required": true,
+                    "required": false,
                     "array": false,
-                    "size": 50,
-                    "default": null
+                    "relatedCollection": "places",
+                    "relationType": "manyToOne",
+                    "twoWay": false,
+                    "twoWayKey": "photos",
+                    "onDelete": "cascade",
+                    "side": "parent"
                 },
                 {
-                    "key": "file_id",
-                    "type": "string",
+                    "key": "user",
+                    "type": "relationship",
                     "status": "available",
-                    "required": true,
+                    "required": false,
                     "array": false,
-                    "size": 50,
-                    "default": null
+                    "relatedCollection": "users",
+                    "relationType": "manyToOne",
+                    "twoWay": false,
+                    "twoWayKey": "photos",
+                    "onDelete": "cascade",
+                    "side": "parent"
                 }
             ],
-            "indexes": [
-                {
-                    "key": "key_place_id_asc_file_id_asc",
-                    "type": "key",
-                    "status": "available",
-                    "attributes": [
-                        "place_id",
-                        "file_id"
-                    ],
-                    "orders": [
-                        "ASC",
-                        "ASC"
-                    ]
-                },
-                {
-                    "key": "key_created_desc",
-                    "type": "key",
-                    "status": "available",
-                    "attributes": [
-                        "created"
-                    ],
-                    "orders": [
-                        "DESC"
-                    ]
-                }
-            ]
+            "indexes": []
         },
         {
             "$id": "users",
-            "$createdAt": "",
-            "$updatedAt": "2022-10-26T04:47:28.163+00:00",
             "$permissions": [
                 "read(\"any\")"
             ],
@@ -399,16 +190,18 @@
         {
             "$id": "create-user",
             "name": "create-user",
-            "runtime": "node-16.0",
+            "enabled": true,
+            "logging": true,
+            "runtime": "node-22",
             "path": "appwrite-functions/create-user",
-            "entrypoint": "src/index.js",
-            "vars": {
-                "APPWRITE_FUNCTION_ENDPOINT": "",
-                "APPWRITE_FUNCTION_API_KEY": ""
-            },
+            "entrypoint": "dist/index.js",
+            "commands": "npm install && npm run build",
             "execute": [],
             "events": [
                 "users.*.create"
+            ],
+            "scopes": [
+                "documents.write"
             ],
             "schedule": "",
             "timeout": 15
@@ -416,15 +209,17 @@
         {
             "$id": "create-comment",
             "name": "create-comment",
-            "runtime": "node-16.0",
+            "enabled": true,
+            "logging": true,
+            "runtime": "node-22",
             "path": "appwrite-functions/create-comment",
-            "entrypoint": "src/index.js",
-            "vars": {
-                "APPWRITE_FUNCTION_ENDPOINT": "",
-                "APPWRITE_FUNCTION_API_KEY": ""
-            },
+            "entrypoint": "dist/index.js",
+            "commands": "npm install && npm run build",
             "execute": [
                 "users"
+            ],
+            "scopes": [
+                "documents.write"
             ],
             "events": [],
             "schedule": "",
@@ -433,15 +228,17 @@
         {
             "$id": "create-photo",
             "name": "create-photo",
-            "runtime": "node-16.0",
+            "enabled": true,
+            "logging": true,
+            "runtime": "node-22",
             "path": "appwrite-functions/create-photo",
-            "entrypoint": "src/index.js",
-            "vars": {
-                "APPWRITE_FUNCTION_ENDPOINT": "",
-                "APPWRITE_FUNCTION_API_KEY": ""
-            },
+            "entrypoint": "dist/index.js",
+            "commands": "npm install && npm run build",
             "execute": [
                 "users"
+            ],
+            "scopes": [
+                "documents.write"
             ],
             "events": [],
             "schedule": "",
@@ -450,19 +247,68 @@
         {
             "$id": "process-photo",
             "name": "process-photo",
-            "runtime": "node-16.0",
+            "enabled": true,
+            "logging": true,
+            "runtime": "node-22",
             "path": "appwrite-functions/process-photo",
-            "entrypoint": "src/index.js",
-            "vars": {
-                "APPWRITE_FUNCTION_ENDPOINT": "",
-                "APPWRITE_FUNCTION_API_KEY": ""
-            },
+            "entrypoint": "dist/index.js",
+            "commands": "npm install --os=linux --libc=musl --cpu=x64 sharp && npm install && npm run build",
             "execute": [],
             "events": [
                 "buckets.photo-uploads.files.*.create"
             ],
+            "scopes": [
+                "documents.read",
+                "documents.write",
+                "files.read",
+                "files.write"
+            ],
             "schedule": "",
             "timeout": 15
+        }
+    ],
+    "buckets": [
+        {
+            "$id": "photo-uploads",
+            "$createdAt": "2023-04-07T21:23:16.876+00:00",
+            "$updatedAt": "2023-04-07T21:23:16.876+00:00",
+            "$permissions": [
+                "create(\"users\")"
+            ],
+            "fileSecurity": true,
+            "name": "Photo Uploads",
+            "enabled": true,
+            "maximumFileSize": 5000000,
+            "allowedFileExtensions": [
+                "jpg",
+                "png",
+                "heic",
+                "jpeg"
+            ],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        },
+        {
+            "$id": "photos",
+            "$createdAt": "2023-04-07T21:23:16.876+00:00",
+            "$updatedAt": "2023-04-07T21:23:16.876+00:00",
+            "$permissions": [
+                "read(\"any\")"
+            ],
+            "fileSecurity": false,
+            "name": "Photos",
+            "enabled": true,
+            "maximumFileSize": 5000000,
+            "allowedFileExtensions": [
+                "jpg",
+                "png",
+                "heic",
+                "jpeg"
+            ],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
         }
     ]
 }

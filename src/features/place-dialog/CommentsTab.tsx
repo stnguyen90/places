@@ -1,4 +1,4 @@
-import React from "react";
+import { Add, Send } from "@mui/icons-material";
 import {
   Alert,
   Box,
@@ -12,21 +12,20 @@ import {
   OutlinedInput,
   Typography,
 } from "@mui/material";
-import { Add, Send } from "@mui/icons-material";
+import React from "react";
 import {
   useCreateCommentMutation,
   useGetAccountQuery,
   useGetCommentsQuery,
-  useGetUsersQuery,
 } from "../../services/appwrite";
-import { Place, User } from "../../services/types";
+import { Place } from "../../services/types";
 
 export function CommentsTab(props: { place: Place | null }) {
   const placeId = props.place?.$id || "";
   const { data: comments, isLoading: getCommentsIsLoading } =
     useGetCommentsQuery(
       {
-        place_id: placeId,
+        placeId,
       },
       { skip: placeId === "" }
     );
@@ -35,17 +34,7 @@ export function CommentsTab(props: { place: Place | null }) {
   const [comment, setComment] = React.useState("");
   const [createComment, createCommentResult] = useCreateCommentMutation();
 
-  const userIds = new Set<string>();
-  comments?.forEach((c) => {
-    userIds.add(c.user_id);
-  });
-
-  const { data: users, isLoading: getUsersIsLoading } = useGetUsersQuery(
-    { user_ids: Array.from(userIds) },
-    { skip: userIds.size === 0 }
-  );
-
-  if (getCommentsIsLoading || getUsersIsLoading)
+  if (getCommentsIsLoading)
     return (
       <Box
         display="flex"
@@ -57,11 +46,6 @@ export function CommentsTab(props: { place: Place | null }) {
       </Box>
     );
 
-  const usersMap = new Map<string, User>();
-  users?.forEach((u) => {
-    usersMap.set(u.$id, u);
-  });
-
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setComment(event.target.value);
   };
@@ -70,7 +54,7 @@ export function CommentsTab(props: { place: Place | null }) {
     if (comment === "") return;
     try {
       await createComment({
-        place_id: placeId,
+        placeId: placeId,
         text: comment,
       }).unwrap();
       setComment("");
@@ -130,9 +114,7 @@ export function CommentsTab(props: { place: Place | null }) {
         </ListItem>
       )}
       {(comments || []).map((c) => {
-        const name = usersMap.get(c.user_id)?.name || "John Doe";
-
-        const date = new Date(c.created);
+        const date = new Date(c.$createdAt);
         const day = date.toLocaleDateString();
         const time = date.toLocaleTimeString();
 
@@ -142,7 +124,7 @@ export function CommentsTab(props: { place: Place | null }) {
               disableTypography
               primary={
                 <Typography variant="h6" color="text.primary">
-                  {name}
+                  {c.user?.name || "John Doe"}
                 </Typography>
               }
               secondary={

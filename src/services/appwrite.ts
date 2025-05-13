@@ -1,6 +1,6 @@
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
 import { Account, Client, Databases, Functions as FunctionsService, ID, Models, Query, Storage } from "appwrite";
-import { Comment, Photo, Place, User } from "./types";
+import type { Comment, Photo, Place } from "./types";
 
 export const client = new Client();
 const account = new Account(client);
@@ -26,16 +26,14 @@ const Attributes = {
     Name: "name",
   },
   Comments: {
-    Created: "created",
-    PlaceId: "place_id",
-    UserId: "user_id",
+    Place: "place",
+    User: "user",
     Text: "text",
   },
   Photos: {
-    Created: "created",
-    PlaceId: "place_id",
-    UserId: "user_id",
-    FileId: "file_id",
+    Place: "place",
+    User: "user",
+    FileId: "fileId",
     Text: "text",
   },
 } as const;
@@ -51,15 +49,15 @@ const Functions = {
 } as const;
 
 client
-  .setEndpoint(process.env["REACT_APP_APPWRITE_ENDPOINT"] || "")
-  .setProject(process.env["REACT_APP_APPWRITE_PROJECT_ID"] || "");
+  .setEndpoint(process.env.REACT_APP_APPWRITE_ENDPOINT || "")
+  .setProject(process.env.REACT_APP_APPWRITE_PROJECT_ID || "");
 
 export const appwriteApi = createApi({
   baseQuery: fakeBaseQuery(),
   tagTypes: ["Account", "Comments", "Users", "Photos"],
   endpoints: (builder) => ({
     createAccount: builder.mutation<
-      Models.Account<Models.Preferences>,
+      Models.User<Models.Preferences>,
       { name: string; email: string; password: string }
     >({
       queryFn: async (args) => {
@@ -85,7 +83,7 @@ export const appwriteApi = createApi({
       invalidatesTags: ["Account"],
       queryFn: async (args) => {
         try {
-          const session = await account.createEmailSession(
+          const session = await account.createEmailPasswordSession(
             args.email,
             args.password
           );
@@ -112,7 +110,7 @@ export const appwriteApi = createApi({
         }
       },
     }),
-    getAccount: builder.query<Models.Account<Models.Preferences> | null, void>({
+    getAccount: builder.query<Models.User<Models.Preferences> | null, void>({
       providesTags: ["Account"],
       queryFn: async () => {
         try {
@@ -177,43 +175,22 @@ export const appwriteApi = createApi({
         }
       },
     }),
-    getUsers: builder.query<
-      User[],
-      {
-        user_ids: string[];
-      }
-    >({
-      queryFn: async (arg) => {
-        try {
-          const documentList = await databases.listDocuments<User>(
-            databaseId,
-            Collections.Users,
-            [Query.equal("$id", arg.user_ids)]
-          );
-          return { data: documentList.documents };
-        } catch (e) {
-          return {
-            error: e,
-          };
-        }
-      },
-    }),
     createComment: builder.mutation<
       Models.Execution,
-      { place_id: string; text: string }
+      { placeId: string; text: string }
     >({
       invalidatesTags: ["Comments"],
       queryFn: async (args) => {
         try {
           const data = {
-            [Attributes.Comments.PlaceId]: args.place_id,
+            'placeId': args.placeId,
             [Attributes.Comments.Text]: args.text,
           };
 
           const execution = await functions.createExecution(
             Functions.CreateComment,
             JSON.stringify(data),
-            false
+            false,
           );
 
           if (execution.status === "completed") {
@@ -221,7 +198,7 @@ export const appwriteApi = createApi({
           }
 
           return {
-            error: execution.stderr,
+            error: execution.errors,
           };
         } catch (e) {
           return {
@@ -233,7 +210,7 @@ export const appwriteApi = createApi({
     getComments: builder.query<
       Comment[],
       {
-        place_id: string;
+        placeId: string;
       }
     >({
       providesTags: ["Comments"],
@@ -243,8 +220,8 @@ export const appwriteApi = createApi({
             databaseId,
             Collections.Comments,
             [
-              Query.equal(Attributes.Comments.PlaceId, arg.place_id),
-              Query.orderDesc(Attributes.Comments.Created)
+              Query.equal(Attributes.Comments.Place, arg.placeId),
+              Query.orderDesc('$createdAt'),
             ],
           );
           return { data: documentList.documents };
@@ -259,7 +236,7 @@ export const appwriteApi = createApi({
       Models.File,
       {
         file: File;
-        place_id: string;
+        placeId: string;
         text: string;
       }
     >({
@@ -267,7 +244,7 @@ export const appwriteApi = createApi({
       queryFn: async (args) => {
         try {
           const data = {
-            [Attributes.Photos.PlaceId]: args.place_id,
+            'placeId': args.placeId,
             [Attributes.Photos.Text]: args.text,
           };
 
@@ -279,11 +256,11 @@ export const appwriteApi = createApi({
 
           if (execution.status !== "completed") {
             return {
-              error: execution.stderr,
+              error: execution.errors,
             };
           }
 
-          const docId = execution.response;
+          const docId = execution.responseBody;
 
           const file = await storage.createFile(
             Buckets.PhotoUploads,
@@ -302,7 +279,7 @@ export const appwriteApi = createApi({
     getPhotos: builder.query<
       Photo[],
       {
-        place_id: string;
+        placeId: string;
       }
     >({
       providesTags: ["Photos"],
@@ -312,9 +289,9 @@ export const appwriteApi = createApi({
             databaseId,
             Collections.Photos,
             [
-              Query.equal(Attributes.Photos.PlaceId, arg.place_id),
+              Query.equal(Attributes.Photos.Place, arg.placeId),
               Query.notEqual(Attributes.Photos.FileId, ""),
-              Query.orderDesc(Attributes.Photos.Created)
+              Query.orderDesc('$createdAt')
             ],
           );
           return { data: documentList.documents };
@@ -337,7 +314,6 @@ export const {
   useGetAccountQuery,
   useCreatePlaceMutation,
   useGetPlacesQuery,
-  useGetUsersQuery,
   useCreateCommentMutation,
   useGetCommentsQuery,
   useUploadPhotoMutation,

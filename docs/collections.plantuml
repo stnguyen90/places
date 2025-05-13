@@ -8,36 +8,35 @@ class Places {
 
 ' class Submissions {
 '     $id : string
-'     user_id : string
+'     $createdAt : string
+'     user : string
 '     latitude : float
 '     longitude : float
-'     created : string
 ' }
 
 class Comments {
     $id : string
-    created : string
-    place_id : string
-    user_id : string
+    $createdAt : string
+    place : string
+    user : string
     text : string
 }
 
 ' class Votes {
 '     $id : string
-'     place_id : string
-'     user_id : string
-'     created : string
+'     $createdAt : string
+'     place : string
+'     user : string
 '     value : int
 ' }
 
 class Photos {
     $id : string
-    created : string
-    file_id : string
-    place_id : string
-    user_id : string
+    $createdAt : string
+    fileId : string
+    place : string
+    user : string
     text : string
-
 }
 
 class Users {

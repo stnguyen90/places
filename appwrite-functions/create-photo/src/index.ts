@@ -1,82 +1,35 @@
-import * as sdk from "node-appwrite";
+import { Databases, ID } from "node-appwrite";
+import { Collections, databaseId } from "./common/constants.js";
+import type { AppwriteContext } from "./common/types.js";
+import { initializeClient } from "./common/utils.js";
 
-/*
-  'req' variable has:
-    'headers' - object with request headers
-    'payload' - object with request body data
-    'variables' - object with environment variables
+async function main({ req, res }: AppwriteContext) {
+  const client = initializeClient(req);
 
-  'res' variable has:
-    'send(text, status)' - function to return text response. Status code defaults to 200
-    'json(obj, status)' - function to return JSON response. Status code defaults to 200
+  const databases = new Databases(client);
 
-  If an error is thrown, a response with code 500 will be returned.
-*/
+  const data = req.bodyJson as {
+    placeId: string;
+    text: string;
+  };
 
-interface AppwriteRequest {
-  headers: { [name: string]: string };
-  payload: string;
-  variables: { [name: string]: string };
-}
-
-interface AppwriteResponse {
-  send: (string, number?) => {};
-  json: (object, number?) => {};
-}
-
-const databaseId = "default";
-const placesCollectionId = "places";
-const photosCollectionId = "photos";
-
-module.exports = async function (req: AppwriteRequest, res: AppwriteResponse) {
-  const client = new sdk.Client();
-
-  const databases = new sdk.Databases(client);
-
-  if (
-    !req.variables["APPWRITE_FUNCTION_ENDPOINT"] ||
-    !req.variables["APPWRITE_FUNCTION_API_KEY"]
-  ) {
-    throw Error(
-      "Environment variables are not set. Function cannot use Appwrite SDK."
-    );
-  }
-
-  client
-    .setEndpoint(req.variables["APPWRITE_FUNCTION_ENDPOINT"])
-    .setProject(req.variables["APPWRITE_FUNCTION_PROJECT_ID"])
-    .setKey(req.variables["APPWRITE_FUNCTION_API_KEY"]);
-
-  const data = JSON.parse(req.payload);
-
-  const placeId = data["place_id"];
-  const text = data["text"];
-
-  // validate placeId
-  try {
-    await databases.getDocument(databaseId, placesCollectionId, placeId);
-  } catch {
-    res.json(
-      {
-        message: `Invalid place_id: ${placeId}`,
-      },
-      500
-    );
-    return;
-  }
+  const placeId = data.placeId;
+  const text = data.text;
 
   const doc = await databases.createDocument(
     databaseId,
-    photosCollectionId,
-    sdk.ID.unique(),
+    Collections.Photos,
+    ID.unique(),
     {
-      created: new Date().toISOString(),
-      place_id: placeId,
-      file_id: "",
-      user_id: req.variables["APPWRITE_FUNCTION_USER_ID"],
-      text: text,
-    }
+      place: placeId,
+      fileId: "",
+      user: req.headers["x-appwrite-user-id"],
+      text,
+    },
   );
 
-  res.send(doc.$id);
-};
+  return res.send(doc.$id);
+}
+
+export default main;
+  

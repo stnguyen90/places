@@ -1,59 +1,22 @@
-import * as sdk from "node-appwrite";
+import { Databases, type Models } from "node-appwrite";
+import { Collections, databaseId } from "./common/constants.js";
+import type { AppwriteContext } from "./common/types.js";
+import { initializeClient } from "./common/utils.js";
 
-/*
-  'req' variable has:
-    'headers' - object with request headers
-    'payload' - object with request body data
-    'variables' - object with environment variables
+async function main({ req, res, log }: AppwriteContext) {
+  const client = initializeClient(req);
 
-  'res' variable has:
-    'send(text, status)' - function to return text response. Status code defaults to 200
-    'json(obj, status)' - function to return JSON response. Status code defaults to 200
+  const database = new Databases(client);
 
-  If an error is thrown, a response with code 500 will be returned.
-*/
+  const user = req.bodyJson as Models.User<Models.Preferences>;
 
-interface AppwriteRequest {
-  headers: { [name: string]: string };
-  payload: string;
-  variables: { [name: string]: string };
+  log(user);
+
+  await database.createDocument(databaseId, Collections.Users, user.$id, {
+    name: user.name,
+  });
+
+  return res.send(`Created user ${user.$id} in collection users`);
 }
 
-interface AppwriteResponse {
-  send: (string, number?) => {};
-  json: (object, number?) => {};
-}
-
-const databaseId = "default";
-const usersCollectionId = "users";
-
-module.exports = async function (req: AppwriteRequest, res: AppwriteResponse) {
-  const client = new sdk.Client();
-
-  let database = new sdk.Databases(client);
-
-  if (
-    !req.variables["APPWRITE_FUNCTION_ENDPOINT"] ||
-    !req.variables["APPWRITE_FUNCTION_API_KEY"]
-  ) {
-    throw Error(
-      "Environment variables are not set. Function cannot use Appwrite SDK."
-    );
-  }
-
-  client
-    .setEndpoint(req.variables["APPWRITE_FUNCTION_ENDPOINT"])
-    .setProject(req.variables["APPWRITE_FUNCTION_PROJECT_ID"])
-    .setKey(req.variables["APPWRITE_FUNCTION_API_KEY"]);
-
-  const eventData = req.variables["APPWRITE_FUNCTION_EVENT_DATA"];
-  console.log(eventData);
-
-  const user: sdk.Models.User<sdk.Models.Preferences> = JSON.parse(eventData);
-
-  console.log(user);
-
-  await database.createDocument(databaseId, usersCollectionId, user.$id, { name: user.name });
-
-  res.send(`Created user ${user.$id} in collection users`);
-};
+export default main;
